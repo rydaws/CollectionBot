@@ -7,3 +7,6 @@ config.json
 
 #Ignore lint files
 .eslintrc.json
+
+#Ignore .idea files
+.idea
