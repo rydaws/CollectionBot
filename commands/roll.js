@@ -21,7 +21,3 @@ module.exports = {
         await interaction.reply(`Lower bound: ${lower} Upper bound: ${upper} Random roll result: ${roll}`);
 	},
 };
-
-// var upper =
-// var lower =
-// const roll = Math.floor(Math.random() * upper) + lower;

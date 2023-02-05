@@ -11,8 +11,6 @@ module.exports = {
 	async execute(interaction) {
 
 		const data = await getData();
-		console.log(data.body[0].setup);
-		console.log(data.body[0].punchline);
 
 		await interaction.reply(data.body[0].setup);
 		await wait(2000);
