@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Client } = require('pg');
 const dotenv = require('dotenv');
 dotenv.config();
@@ -22,7 +22,9 @@ module.exports = {
 		const id = interaction.options.getInteger('id');
 
 		await connectDb(id);
-		await interaction.reply(name + type + level);
+		const em = await createEmbed();
+		//await interaction.reply(`Name: ${name} Type: ${type} Level: ${level}`);
+		await interaction.reply({ embeds: [em] });
 	},
 };
 
@@ -51,3 +53,21 @@ const connectDb = async (id) => {
 		console.log(error);
 	}
 };
+
+function createEmbed() {
+	const exampleEmbed = new EmbedBuilder()
+		.setColor(0x0099FF)
+		.setTitle('Queried Monster')
+		.setAuthor({ name: 'Eavan', iconURL: 'https://rdawson.s3.amazonaws.com/austin.jpeg' })
+		.setDescription('Stats for the monster')
+		.setThumbnail('https://i.imgur.com/UfNVa3J.jpeg')
+		.addFields(
+			{ name: 'Name', value: `${name}`, inline: true },
+			{ name: 'Type', value: `${type}`, inline: true },
+			{ name: 'Level', value: `${level}`, inline: true },
+		)
+		.setImage('https://i.imgur.com/UfNVa3J.jpeg')
+		.setTimestamp()
+		.setFooter({ text: 'Some footer text here' });
+	return exampleEmbed;
+}
