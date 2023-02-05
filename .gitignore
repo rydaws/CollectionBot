@@ -2,7 +2,7 @@
 node_modules
 
 #Ignore files related to API keys
-process.env
+.env
 config.json
 
 #Ignore lint files
