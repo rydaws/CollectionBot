@@ -4,10 +4,12 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 let res;
+let user;
 let name;
+let className;
 let type;
+let rarity;
 let level;
-
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -20,7 +22,9 @@ module.exports = {
 
 	async execute(interaction) {
 		const id = interaction.options.getInteger('id');
-
+		user = interaction.user;
+		console.log(user.username);
+		console.log(user.avatarURL());
 		await connectDb(id);
 		const em = await createEmbed();
 		//await interaction.reply(`Name: ${name} Type: ${type} Level: ${level}`);
@@ -39,15 +43,23 @@ const connectDb = async (id) => {
 		});
 
 		await client.connect();
-		res = await client.query(`SELECT * FROM monsters WHERE id=${id}`);
+		try {
+			res = await client.query(`SELECT * FROM monsters WHERE id=${id}`);
+		}
+		catch (e) {
+			await createErrorEmbed();
+		}
 		name = res.rows[0].display_name;
+		className = res.rows[0].class;
 		type = res.rows[0].type;
+		rarity = res.rows[0].rarity;
 		level = res.rows[0].level;
 		console.log(res);
 		console.log('Returning display name: ' + name);
 		console.log('Returning type: ' + type);
 		console.log('Returning level: ' + level);
 		await client.end();
+		await createEmbed();
 	}
 	catch (error) {
 		console.log(error);
@@ -55,19 +67,28 @@ const connectDb = async (id) => {
 };
 
 function createEmbed() {
-	const exampleEmbed = new EmbedBuilder()
+	const embed = new EmbedBuilder()
 		.setColor(0x0099FF)
 		.setTitle('Queried Monster')
-		.setAuthor({ name: 'Eavan', iconURL: 'https://rdawson.s3.amazonaws.com/austin.jpeg' })
+		.setAuthor({ name: user.username, iconURL: user.avatarURL() })
 		.setDescription('Stats for the monster')
-		.setThumbnail('https://i.imgur.com/UfNVa3J.jpeg')
+		.setThumbnail(user.avatarURL())
 		.addFields(
 			{ name: 'Name', value: `${name}`, inline: true },
+			{ name: 'Class', value: `${className}`, inline: true },
 			{ name: 'Type', value: `${type}`, inline: true },
+			{ name: 'Rarity', value: `${rarity}`, inline: true },
 			{ name: 'Level', value: `${level}`, inline: true },
 		)
-		.setImage('https://i.imgur.com/UfNVa3J.jpeg')
+		//.setImage('https://i.imgur.com/UfNVa3J.jpeg')
 		.setTimestamp()
 		.setFooter({ text: 'Some footer text here' });
-	return exampleEmbed;
+	return embed;
+}
+
+function createErrorEmbed() {
+	const embed = new EmbedBuilder()
+		.setTitle('Error!')
+		.setDescription('Monster not found! Is the ID right?');
+	return embed;
 }
