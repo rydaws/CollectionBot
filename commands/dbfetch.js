@@ -10,6 +10,7 @@ let className;
 let type;
 let rarity;
 let level;
+let img;
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -54,6 +55,7 @@ const connectDb = async (id) => {
 		type = res.rows[0].type;
 		rarity = res.rows[0].rarity;
 		level = res.rows[0].level;
+		img = res.rows[0].img;
 		console.log(res);
 		console.log('Returning display name: ' + name);
 		console.log('Returning type: ' + type);
@@ -72,7 +74,7 @@ function createEmbed() {
 		.setTitle('Queried Monster')
 		.setAuthor({ name: user.username, iconURL: user.avatarURL() })
 		.setDescription('Stats for the monster')
-		.setThumbnail(user.avatarURL())
+		.setThumbnail(img)
 		.addFields(
 			{ name: 'Name', value: `${name}`, inline: true },
 			{ name: 'Class', value: `${className}`, inline: true },
@@ -80,9 +82,9 @@ function createEmbed() {
 			{ name: 'Rarity', value: `${rarity}`, inline: true },
 			{ name: 'Level', value: `${level}`, inline: true },
 		)
-		// .setImage('https://i.imgur.com/UfNVa3J.jpeg')
+		// .setImage('https://collection-monsters.s3.amazonaws.com/the-dogAvatar.png')
 		.setTimestamp()
-		.setFooter({ text: 'Some footer text here' });
+		.setFooter({ text: 'Click options below to capture!' });
 	return embed;
 }
 
