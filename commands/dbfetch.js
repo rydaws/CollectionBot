@@ -27,7 +27,7 @@ module.exports = {
 		console.log(user.avatarURL());
 		await connectDb(id);
 		const em = await createEmbed();
-		//await interaction.reply(`Name: ${name} Type: ${type} Level: ${level}`);
+		// await interaction.reply(`Name: ${name} Type: ${type} Level: ${level}`);
 		await interaction.reply({ embeds: [em] });
 	},
 };
@@ -39,7 +39,7 @@ const connectDb = async (id) => {
 			host: process.env.PGHOST,
 			database: process.env.PGDATABASE,
 			password: process.env.PGPASSWORD,
-			port: process.env.PGPORT
+			port: process.env.PGPORT,
 		});
 
 		await client.connect();
@@ -80,7 +80,7 @@ function createEmbed() {
 			{ name: 'Rarity', value: `${rarity}`, inline: true },
 			{ name: 'Level', value: `${level}`, inline: true },
 		)
-		//.setImage('https://i.imgur.com/UfNVa3J.jpeg')
+		// .setImage('https://i.imgur.com/UfNVa3J.jpeg')
 		.setTimestamp()
 		.setFooter({ text: 'Some footer text here' });
 	return embed;
