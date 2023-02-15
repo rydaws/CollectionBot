@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Client } = require('pg');
+const { con } = require('../db');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -35,13 +36,7 @@ module.exports = {
 
 const connectDb = async (id) => {
 	try {
-		const client = new Client({
-			user: process.env.PGUSER,
-			host: process.env.PGHOST,
-			database: process.env.PGDATABASE,
-			password: process.env.PGPASSWORD,
-			port: process.env.PGPORT,
-		});
+		const client  = new Client(con);
 
 		await client.connect();
 		try {
