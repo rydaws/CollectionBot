@@ -25,8 +25,6 @@ module.exports = {
 	async execute(interaction) {
 		const id = interaction.options.getInteger('id');
 		user = interaction.user;
-		console.log(user.username);
-		console.log(user.avatarURL());
 		await connectDb(id);
 		const em = await createEmbed();
 		// await interaction.reply(`Name: ${name} Type: ${type} Level: ${level}`);
@@ -51,7 +49,6 @@ const connectDb = async (id) => {
 		rarity = res.rows[0].rarity;
 		level = res.rows[0].level;
 		img = res.rows[0].img;
-		console.log(res);
 		console.log('Returning display name: ' + name);
 		console.log('Returning type: ' + type);
 		console.log('Returning level: ' + level);
