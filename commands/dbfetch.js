@@ -61,7 +61,7 @@ const connectDb = async (id) => {
 };
 
 function createEmbed() {
-	const embed = new EmbedBuilder()
+	return new EmbedBuilder()
 		.setColor(0x0099FF)
 		.setTitle('Queried Monster')
 		.setAuthor({ name: user.username, iconURL: user.avatarURL() })
@@ -77,12 +77,10 @@ function createEmbed() {
 		// .setImage('https://collection-monsters.s3.amazonaws.com/the-dogAvatar.png')
 		.setTimestamp()
 		.setFooter({ text: 'Click options below to capture!' });
-	return embed;
 }
 
 function createErrorEmbed() {
-	const embed = new EmbedBuilder()
+	return new EmbedBuilder()
 		.setTitle('Error!')
 		.setDescription('Monster not found! Is the ID right?');
-	return embed;
 }
