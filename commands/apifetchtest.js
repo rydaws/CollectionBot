@@ -13,7 +13,7 @@ module.exports = {
 		const data = await getData();
 
 		await interaction.reply(data.body[0].setup);
-		await wait(2000);
+		await wait(4000);
 		await interaction.editReply(data.body[0].punchline);
 	},
 };
