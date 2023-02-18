@@ -22,7 +22,6 @@ module.exports = {
 		try {
 			await client.query(`INSERT INTO box VALUES (${client_id}, ${monster_id}, 1)`);
 			res = await client.query(`SELECT * FROM monsters WHERE id = ${monster_id}`);
-			console.log(res);
 
 			const monster_name = res.rows[0].display_name;
 
