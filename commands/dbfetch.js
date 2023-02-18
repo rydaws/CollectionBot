@@ -32,6 +32,9 @@ module.exports = {
 };
 
 const connectDb = async (id) => {
+
+	// TODO remake with generalized connection seen in 'db.js'
+
 	try {
 		const client  = new Client(con);
 

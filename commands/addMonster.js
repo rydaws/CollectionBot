@@ -3,12 +3,11 @@ const { con } = require('../db');
 const { Client } = require('pg');
 
 let res;
-let level;
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('uplevel')
-		.setDescription('Bumps specified monster level by 1')
+		.setName('addmonster')
+		.setDescription('Adds monster to your box')
 		.addIntegerOption(option =>
 			option.setName('id')
 				.setDescription('The id of the monster')
@@ -21,20 +20,19 @@ module.exports = {
 		await client.connect();
 
 		try {
-			res = await client.query(`SELECT level FROM box WHERE client_id=${client_id} AND id=${monster_id}`);
-			level = res.rows[0].level + 1;
-			await client.query(`UPDATE box SET level = ${level} WHERE client_id = ${client_id} AND id = ${monster_id}`);
-			res = await client.query(`SELECT level FROM box WHERE client_id = ${client_id} AND id = ${monster_id}`);
+			await client.query(`INSERT INTO box VALUES (${client_id}, ${monster_id}, 1)`);
+			res = await client.query(`SELECT * FROM monsters WHERE id = ${monster_id}`);
+			console.log(res);
 
-			level = res.rows[0].level;
-			console.log(level);
+			const monster_name = res.rows[0].display_name;
+
 			// TODO Make into embed, see https://discordjs.guide/popular-topics/embeds.html#embed-preview
-			await interaction.reply(`Increased level for ${monster_id} to ${res.rows[0].level}`);
+			await interaction.reply(`Added ${monster_name} to your box`);
 		}
 		catch (error) {
 			// TODO Make into embed, see https://discordjs.guide/popular-topics/embeds.html#embed-preview
 			console.log('FAILED');
-			await interaction.reply('You do not own that monster');
+			await interaction.reply('That monster does not exist or you already own it!');
 		}
 
 		client.end();
