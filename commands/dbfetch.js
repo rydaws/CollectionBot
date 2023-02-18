@@ -10,7 +10,6 @@ let name;
 let className;
 let type;
 let rarity;
-let level;
 let img;
 
 module.exports = {
@@ -47,11 +46,9 @@ const connectDb = async (id) => {
 		className = res.rows[0].class;
 		type = res.rows[0].type;
 		rarity = res.rows[0].rarity;
-		level = res.rows[0].level;
 		img = res.rows[0].img;
 		console.log('Returning display name: ' + name);
 		console.log('Returning type: ' + type);
-		console.log('Returning level: ' + level);
 		await client.end();
 		await createEmbed();
 	}
@@ -72,7 +69,6 @@ function createEmbed() {
 			{ name: 'Class', value: `${className}`, inline: true },
 			{ name: 'Type', value: `${type}`, inline: true },
 			{ name: 'Rarity', value: `${rarity}`, inline: true },
-			{ name: 'Level', value: `${level}`, inline: true },
 		)
 		// .setImage('https://collection-monsters.s3.amazonaws.com/the-dogAvatar.png')
 		.setTimestamp()
