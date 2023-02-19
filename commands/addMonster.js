@@ -1,6 +1,7 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { con } = require('../db');
 const { Client } = require('pg');
+const { errorEmbed } = require('../Util/EmbedUtil');
 
 let res;
 
@@ -30,8 +31,8 @@ module.exports = {
 		}
 		catch (error) {
 			// TODO Make into embed, see https://discordjs.guide/popular-topics/embeds.html#embed-preview
-			console.log('FAILED');
-			await interaction.reply('That monster does not exist or you already own it!');
+			console.log(`[AddMonster] Failed to add monster to ${client_id}'s box.`);
+			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('That monster does not exist or you already own it!'))] });
 		}
 
 		client.end();

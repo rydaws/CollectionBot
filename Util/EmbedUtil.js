@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
-function buildEmbed(user, res) {
-	console.log('Starts embed build');
+function monsterEmbed(user, res) {
+	console.log('[DisplayMonster] Starts embed build');
 	const name = res.rows[0].display_name;
 	const className = res.rows[0].class;
 	const type = res.rows[0].type;
@@ -20,10 +20,28 @@ function buildEmbed(user, res) {
 			{ name: 'Rarity', value: `${rarity}`, inline: true },
 		)
 		// .setImage('https://collection-monsters.s3.amazonaws.com/the-dogAvatar.png')
-		.setTimestamp()
-		.setFooter({ text: 'Click options below to capture!' });
+		.setTimestamp();
+	// .setFooter({ text: 'Click options below to capture!' });
+}
+
+function errorEmbed(description) {
+	return new EmbedBuilder()
+		.setColor(0xFE514E)
+		.setTitle('Error')
+		.setDescription(description)
+		.setTimestamp();
+}
+
+function textEmbed(description) {
+	return new EmbedBuilder()
+		.setColor(0x0099FF)
+		.setTitle('Information')
+		.setDescription(description)
+		.setTimestamp();
 }
 
 module.exports = {
-	buildEmbed,
+	monsterEmbed,
+	errorEmbed,
+	textEmbed,
 };

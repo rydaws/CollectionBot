@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { buildEmbed } = require('../displayMonster');
+const { monsterEmbed, errorEmbed } = require('../Util/EmbedUtil');
 const { con } = require('../db');
 const { Client } = require('pg');
 
@@ -21,28 +21,27 @@ module.exports = {
 			size = Object.keys(res.rows).length;
 
 			if (size === 0) {
-				await interaction.reply('You already own all of the monsters! Focus on training them');
+				console.log(`[Catch] Client ${client_id} owns all monsters.`);
+				await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('You already own all of the monsters! Focus on training them'))] });
+				return;
 			}
 
 			const roll_id = res.rows[Math.floor(Math.random() * (size))].id;
 
 			await client.query(`INSERT INTO box VALUES (${client_id}, ${roll_id}, 1)`);
-			console.log(`Added ${roll_id} to ${interaction.user.username}'s box`);
+			console.log(`[Catch] Added ${roll_id} to ${interaction.user.username}'s box`);
 
 			res = await client.query(`SELECT * FROM monsters WHERE id=${roll_id}`);
 
-			const em = new EmbedBuilder(buildEmbed(interaction.user, res));
+			const em = new EmbedBuilder(monsterEmbed(interaction.user, res));
 
 			await interaction.reply(`You captured ${res.rows[0].display_name}!`);
 			await interaction.followUp({ embeds: [em] });
 
-			// TODO Make into embed, see https://discordjs.guide/popular-topics/embeds.html#embed-preview
-			// TODO Also, make this call the display embed from dbfetch.js instead of the placeholder
-			// await interaction.reply(`Your roll: ${roll_id}`);
 		}
 		catch (error) {
-			// TODO Make into embed, see https://discordjs.guide/popular-topics/embeds.html#embed-preview
-			await interaction.reply('Something went wrong, profile not created. Contact staff!');
+			console.log(`[Catch | ERROR] Failed to catch monster for ${client_id}.`);
+			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Error! Please contact staff if this issue persists'))] });
 		}
 
 		client.end();

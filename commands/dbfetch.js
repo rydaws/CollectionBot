@@ -2,6 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Client } = require('pg');
 const { con } = require('../db');
 const dotenv = require('dotenv');
+const { errorEmbed } = require('../Util/EmbedUtil');
 dotenv.config();
 
 let res;
@@ -24,39 +25,29 @@ module.exports = {
 	async execute(interaction) {
 		const id = interaction.options.getInteger('id');
 		user = interaction.user;
-		await connectDb(id);
-		const em = await createEmbed();
-		// await interaction.reply(`Name: ${name} Type: ${type} Level: ${level}`);
-		await interaction.reply({ embeds: [em] });
-	},
-};
-
-const connectDb = async (id) => {
-
-	// TODO remake with generalized connection seen in 'db.js'
-
-	try {
 		const client  = new Client(con);
 
 		await client.connect();
 		try {
 			res = await client.query(`SELECT * FROM monsters WHERE id=${id}`);
+			name = res.rows[0].display_name;
+			className = res.rows[0].class;
+			type = res.rows[0].type;
+			rarity = res.rows[0].rarity;
+			img = res.rows[0].img;
+
+			console.log(`[Fetch] Retrieving monster with ID ${id} and name ${name}.`);
+
+			const em = createEmbed();
+			await interaction.reply({ embeds: [em] });
 		}
 		catch (e) {
-			await createErrorEmbed();
+			console.log(`[Fetch | ERROR] Failed to fetch monster with id ${id}.`);
+			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Could not fetch monster with that ID!'))] });
 		}
-		name = res.rows[0].display_name;
-		className = res.rows[0].class;
-		type = res.rows[0].type;
-		rarity = res.rows[0].rarity;
-		img = res.rows[0].img;
-		console.log('Returning display name: ' + name);
-		console.log('Returning type: ' + type);
+
 		await client.end();
-	}
-	catch (error) {
-		console.log(error);
-	}
+	},
 };
 
 function createEmbed() {
@@ -75,10 +66,4 @@ function createEmbed() {
 		// .setImage('https://collection-monsters.s3.amazonaws.com/the-dogAvatar.png')
 		.setTimestamp()
 		.setFooter({ text: 'Click options below to capture!' });
-}
-
-function createErrorEmbed() {
-	return new EmbedBuilder()
-		.setTitle('Error!')
-		.setDescription('Monster not found! Is the ID right?');
 }

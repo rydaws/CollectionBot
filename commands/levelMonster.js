@@ -1,6 +1,7 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { con } = require('../db');
 const { Client } = require('pg');
+const { errorEmbed } = require('../Util/EmbedUtil');
 
 let res;
 let level;
@@ -24,17 +25,15 @@ module.exports = {
 			res = await client.query(`SELECT level FROM box WHERE client_id=${client_id} AND id=${monster_id}`);
 			level = res.rows[0].level + 1;
 			await client.query(`UPDATE box SET level = ${level} WHERE client_id = ${client_id} AND id = ${monster_id}`);
-			res = await client.query(`SELECT level FROM box WHERE client_id = ${client_id} AND id = ${monster_id}`);
 
-			level = res.rows[0].level;
-			console.log(level);
+			console.log(`[LevelMonster] Increased monster with with ID ${monster_id} to ${level}.`);
 			// TODO Make into embed, see https://discordjs.guide/popular-topics/embeds.html#embed-preview
-			await interaction.reply(`Increased level for ${monster_id} to ${res.rows[0].level}`);
+			await interaction.reply(`Increased level for ${monster_id} to ${level}`);
 		}
 		catch (error) {
-			// TODO Make into embed, see https://discordjs.guide/popular-topics/embeds.html#embed-preview
-			console.log('FAILED');
-			await interaction.reply('You do not own that monster');
+			console.log(`[LevelMonster | ERROR] Client ${client_id} does not own monster ID ${monster_id}.`);
+			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('You do not own that monster'))] });
+
 		}
 
 		client.end();
