@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Client } = require('pg');
 const { con } = require('../db');
 const dotenv = require('dotenv');
-const { errorEmbed } = require('../Util/EmbedUtil');
+const { errorEmbed } = require('../util/EmbedUtil');
 dotenv.config();
 
 let res;
