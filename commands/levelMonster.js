@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { con } = require('../db');
+const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const { errorEmbed } = require('../util/EmbedUtil');
 

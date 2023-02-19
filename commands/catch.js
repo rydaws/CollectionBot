@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { monsterEmbed, errorEmbed } = require('../util/EmbedUtil');
-const { con } = require('../db');
+const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 
 

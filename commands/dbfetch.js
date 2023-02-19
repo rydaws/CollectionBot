@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Client } = require('pg');
-const { con } = require('../db');
+const { con } = require('../util/QueryUtil');
 const dotenv = require('dotenv');
 const { errorEmbed } = require('../util/EmbedUtil');
 dotenv.config();

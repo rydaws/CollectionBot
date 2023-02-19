@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { con } = require('../db');
+const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const { errorEmbed } = require('../util/EmbedUtil');
 
@@ -15,6 +15,12 @@ module.exports = {
 		await client.connect();
 
 		try {
+			try {
+				await client.query(`SELECT * FROM player WHERE client_id = ${id}`);
+			}
+			catch (e) {
+				console.log(`[Start | ERROR] Profile already exists for ${id}`);
+			}
 			console.log(`[Start] Adding if not exists ${id}`);
 			await client.query(`INSERT INTO player VALUES (${id}, DEFAULT) ON CONFLICT (client_id) DO NOTHING`);
 
