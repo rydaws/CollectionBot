@@ -25,9 +25,11 @@ module.exports = {
 	async execute(interaction) {
 		const id = interaction.options.getInteger('id');
 		user = interaction.user;
-		const client  = new Client(con);
 
+		// Establish connection
+		const client  = new Client(con);
 		await client.connect();
+
 		try {
 			res = await client.query(`SELECT * FROM monsters WHERE id=${id}`);
 			name = res.rows[0].display_name;
@@ -46,6 +48,7 @@ module.exports = {
 			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Could not fetch monster with that ID!'))] });
 		}
 
+		// Close connection
 		await client.end();
 	},
 };

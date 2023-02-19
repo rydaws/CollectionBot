@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
-const { errorEmbed } = require('../util/EmbedUtil');
+const { errorEmbed, textEmbed } = require('../util/EmbedUtil');
 
 let res;
 
@@ -26,12 +26,12 @@ module.exports = {
 
 			const monster_name = res.rows[0].display_name;
 
-			// TODO Make into embed, see https://discordjs.guide/popular-topics/embeds.html#embed-preview
-			await interaction.reply(`Added ${monster_name} to your box`);
+			console.log(`[AddMonster] Added ${monster_name} with id ${monster_id} to client ${client_id}'s box.`);
+			await interaction.reply({ embeds: [new EmbedBuilder(textEmbed('Added ${monster_name} to your box'))] });
+
 		}
 		catch (error) {
-			// TODO Make into embed, see https://discordjs.guide/popular-topics/embeds.html#embed-preview
-			console.log(`[AddMonster] Failed to add monster to ${client_id}'s box.`);
+			console.log(`[AddMonster | ERROR] Failed to add monster to ${client_id}'s box.`);
 			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('That monster does not exist or you already own it!'))] });
 		}
 

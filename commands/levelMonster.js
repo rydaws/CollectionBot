@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
-const { errorEmbed } = require('../util/EmbedUtil');
+const { errorEmbed, textEmbed } = require('../util/EmbedUtil');
 
 let res;
 let level;
@@ -27,8 +27,8 @@ module.exports = {
 			await client.query(`UPDATE box SET level = ${level} WHERE client_id = ${client_id} AND id = ${monster_id}`);
 
 			console.log(`[LevelMonster] Increased monster with with ID ${monster_id} to ${level}.`);
-			// TODO Make into embed, see https://discordjs.guide/popular-topics/embeds.html#embed-preview
-			await interaction.reply(`Increased level for ${monster_id} to ${level}`);
+			await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Increased level for ${monster_id} to ${level}`))] });
+
 		}
 		catch (error) {
 			console.log(`[LevelMonster | ERROR] Client ${client_id} does not own monster ID ${monster_id}.`);

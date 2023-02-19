@@ -33,10 +33,8 @@ module.exports = {
 
 			res = await client.query(`SELECT * FROM monsters WHERE id=${roll_id}`);
 
-			const em = new EmbedBuilder(monsterEmbed(interaction.user, res));
-
 			await interaction.reply(`You captured ${res.rows[0].display_name}!`);
-			await interaction.followUp({ embeds: [em] });
+			await interaction.followUp({ embeds: [new EmbedBuilder(monsterEmbed(interaction.user, res))] });
 
 		}
 		catch (error) {
