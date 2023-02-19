@@ -53,7 +53,6 @@ const connectDb = async (id) => {
 		console.log('Returning display name: ' + name);
 		console.log('Returning type: ' + type);
 		await client.end();
-		await createEmbed();
 	}
 	catch (error) {
 		console.log(error);
