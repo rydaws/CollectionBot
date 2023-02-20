@@ -21,7 +21,7 @@ module.exports = {
 			size = Object.keys(res.rows).length;
 
 			if (size === 0) {
-				console.log(`[Catch] Client ${client_id} owns all monsters.`);
+				console.log(`[Catch | ERROR] Client ${client_id} owns all monsters.`);
 				await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('You already own all of the monsters! Focus on training them'))] });
 				return;
 			}
