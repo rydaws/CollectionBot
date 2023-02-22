@@ -2,11 +2,11 @@
 node_modules
 
 #Ignore files related to API keys
-.env
-config.json
+src/.env
+src/config.json
 
 #Ignore lint files
-.eslintrc.json
+src/.eslintrc.json
 
 #Ignore .idea files
 .idea

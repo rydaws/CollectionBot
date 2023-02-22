@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonComponent } = require('discord.js');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const { errorEmbed } = require('../util/EmbedUtil');
@@ -16,7 +16,6 @@ module.exports = {
 			option.setName('client_id')
 				.setDescription('User\'s box you\'d like to view')),
 	async execute(interaction) {
-
 		user = interaction.user;
 		let client_id = interaction.options.getString('client_id');
 
@@ -24,17 +23,15 @@ module.exports = {
 			client_id = user.id;
 		}
 
-
 		const client = new Client(con);
 		await client.connect();
 
 		try {
-			// res = await client.query(``);
 			res = await client.query(`SELECT box.client_id, box.id, box.level, monsters.display_name from box INNER JOIN monsters ON box.id = monsters.id WHERE client_id = ${client_id} ORDER BY box.id`);
 
 			size = Object.keys(res.rows).length;
 
-			await interaction.reply({ embeds: [createEmbed()] });
+			await interaction.reply({ embeds: [createEmbed()], components: [createButtons()] });
 		}
 		catch (error) {
 			console.log(`[ViewBox | ERROR] Client ${client_id} does not own any monsters `);
@@ -51,14 +48,10 @@ function createEmbed() {
 
 	const embed =  new EmbedBuilder()
 		.setColor(0x0099FF)
-		// .setTitle('Queried Monster')
 		.setAuthor({ name: `${user.username}'s box`, iconURL: user.avatarURL() })
 		.setDescription('**Page 1**')
-		// .setThumbnail(img)
-		// .setImage('https://collection-monsters.s3.amazonaws.com/the-dogAvatar.png')
 		.setTimestamp()
 		.setFooter({ text: 'WILL ONLY SHOW FIRST 20 MONSTERS RIGHT NOW' });
-
 
 	const col1 = [];
 	const col2 = [];
@@ -90,4 +83,15 @@ function createEmbed() {
 
 	}
 	return embed;
+}
+
+function createButtons() {
+	return new ActionRowBuilder()
+		.addComponents(
+			new ButtonComponent()
+				.setCustomId('next')
+				.setLabel('Next')
+				.setStyle(1)
+				.setEmoji('1077754371720368138'),
+		);
 }
