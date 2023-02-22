@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonComponent } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const { errorEmbed } = require('../util/EmbedUtil');
@@ -46,7 +46,7 @@ module.exports = {
 function createEmbed() {
 	console.log('Creating embed....');
 
-	const embed =  new EmbedBuilder()
+	const embed = new EmbedBuilder()
 		.setColor(0x0099FF)
 		.setAuthor({ name: `${user.username}'s box`, iconURL: user.avatarURL() })
 		.setDescription('**Page 1**')
@@ -88,10 +88,17 @@ function createEmbed() {
 function createButtons() {
 	return new ActionRowBuilder()
 		.addComponents(
-			new ButtonComponent()
-				.setCustomId('next')
+			new ButtonBuilder()
+				.setCustomId('last_page')
+				.setLabel('Back')
+				.setStyle(ButtonStyle.Secondary)
+				.setEmoji('⬅️'),
+		)
+		.addComponents(
+			new ButtonBuilder()
+				.setCustomId('next_page')
 				.setLabel('Next')
-				.setStyle(1)
-				.setEmoji('1077754371720368138'),
+				.setStyle(ButtonStyle.Secondary)
+				.setEmoji('➡️'),
 		);
 }
