@@ -10,3 +10,6 @@ src/.eslintrc.json
 
 #Ignore .idea files
 .idea
+
+#Ignore log files
+*.log
