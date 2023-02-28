@@ -1,6 +1,6 @@
 /* eslint-disable indent */
 /* eslint-disable brace-style */
-const { Events, MessageComponentInteraction } = require('discord.js');
+const { Events, MessageComponentInteraction, Client } = require('discord.js');
 
 module.exports = {
 	name: Events.InteractionCreate,
@@ -21,13 +21,18 @@ module.exports = {
 			}
 		}
 		else if (interaction.isButton()) {
-			// const filter = i => i.customId === 'last_page' && i.user.id === interaction.user.id;
-			// const collector = interaction.channel.createMessageComponentCollector({ filter, time: 15000 });
-			// collector.on('collect', async i => {
-			// 	await i.update({ content: 'A button was clicked!', components: [] });
-			// });
-			// collector.on('end', collected => console.log(`Collected ${collected.size} items`));
+			const button = interaction.client.commands.get(interaction.customId);
 
+			if (!button) {
+				return new Error('No code');
+			}
+			try {
+				await button.execute(interaction);
+			}
+			catch (error) {
+				console.log(`Error executing ${interaction.customId}`);
+				console.log(error);
+			}
 		}
 	},
 };
