@@ -6,10 +6,12 @@ const { Commands } = require('../CommandList');
 
 let res;
 let user;
+let ownerId;
 let size;
-const map = new Map();
 let monsterCache = [];
 let currentPage;
+let column = [];
+let pages;
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -19,7 +21,10 @@ module.exports = {
 			option.setName('client_id')
 				.setDescription('User\'s box you\'d like to view')),
 	async execute(interaction) {
+		monsterCache = [];
+		column = [];
 		user = interaction.user;
+		ownerId = user.id;
 		let client_id = interaction.options.getString('client_id');
 
 		if (client_id === null) {
@@ -33,9 +38,6 @@ module.exports = {
 			res = await client.query(`SELECT box.client_id, box.id, box.level, monsters.display_name from box INNER JOIN monsters ON box.id = monsters.id WHERE client_id = ${client_id} ORDER BY box.id`);
 
 			size = Object.keys(res.rows).length;
-			console.log(`Size ${size}`);
-			const newPages = 30 % 10;
-			console.log(`Divide ${newPages}`);
 
 			await interaction.reply({ embeds: [createEmbed()], components: [createButtons()] });
 		}
@@ -47,6 +49,58 @@ module.exports = {
 		client.end();
 
 	},
+	async nextPage(interaction) {
+
+		if (interaction.user.id !== ownerId) {
+			console.log(`[ViewBox | ERROR] Button client: ${interaction.user.id} does not equal embed client: ${ownerId}`);
+			return;
+		}
+		currentPage++;
+
+		if (currentPage > pages) {
+			console.log(`[ViewBox | ERROR] Page ${currentPage} does not exist within pages ${pages} for client: ${user.username}`);
+			await interaction.update({
+				content: 'That page doesn\'t exist!',
+			});
+			currentPage--;
+			return;
+		}
+		const embed = new EmbedBuilder()
+			.setColor(0x0099FF)
+			.setAuthor({ name: `${user.username}'s box`, iconURL: user.avatarURL() })
+			.setDescription(`**Page ${currentPage}**`)
+			.setTimestamp()
+			.setFooter({ text: `Page ${currentPage}/${pages}` })
+			.setFields({ name: ' ', value: `${monsterCache[currentPage].join('')}`, inline: true },
+				{ name: ' ', value: `${monsterCache[currentPage + 1].join('')}`, inline: true });
+
+
+		await interaction.update({ content: '', embeds: [embed], components: [createButtons()] });
+	},
+
+	async lastPage(interaction) {
+
+		if (currentPage === 1) {
+			console.log(`[ViewBox | ERROR] Page ${currentPage - 1} does not exist for client: ${user.username}`);
+			await interaction.update({
+				content: 'That page doesn\'t exist!',
+			});
+			return;
+		}
+
+		currentPage--;
+
+		const embed = new EmbedBuilder()
+			.setColor(0x0099FF)
+			.setAuthor({ name: `${user.username}'s box`, iconURL: user.avatarURL() })
+			.setDescription(`**Page ${currentPage}**`)
+			.setTimestamp()
+			.setFooter({ text: `Page ${currentPage}/${pages}` })
+			.setFields({ name: ' ', value: `${monsterCache[currentPage - 1].join('')}`, inline: true },
+				{ name: ' ', value: `${monsterCache[currentPage].join('')}`, inline: true });
+
+		await interaction.update({ content: ' ', embeds: [embed], components: [createButtons()] });
+	},
 };
 
 function createEmbed() {
@@ -57,37 +111,35 @@ function createEmbed() {
 		.setDescription('**Page 1**')
 		.setTimestamp();
 
-	const col1 = [];
-	const col2 = [];
-
 	currentPage = 1;
-	// 20 entries per page, 2 rows of 10
-	const pages = Math.ceil(size / 20);
-	console.log(`Pages: ${pages}`);
+	pages = Math.ceil(size / 20);
+	console.log(`[ViewBox] Embed for ${user.username}'s box has ${pages} pages`);
 	embed.setFooter({ text: `Page 1/${pages}` });
 
 	if (pages <= 1) {
+		const col1 = [];
 		res.rows.forEach((mon) => col1.push(`\`${mon.id}\` ${mon.display_name}\n`));
 		embed.addFields({ name: ' ', value: `${col1.join('')}`, inline: true });
 	}
 	else {
 		let i = 0;
+
 		res.rows.forEach((mon) => {
 			if (i < 10) {
-				col1.push(`\`${mon.id}\` ${mon.display_name}\n`);
-			}
-			else if (i < 20) {
-				col2.push(`\`${mon.id}\` ${mon.display_name}\n`);
+				column.push(`\`${mon.id}\` ${mon.display_name}\n`);
 			}
 			else {
-				// TODO NEXT PAGE
+				i = 0;
+				monsterCache.push(column);
+				column = [];
+				column.push(`\`${mon.id}\` ${mon.display_name}\n`);
 			}
-			monsterCache.push(`\`${mon.id}\` ${mon.display_name}\n`);
 			i++;
 		});
+		monsterCache.push(column);
 
-		embed.addFields({ name: ' ', value: `${col1.join('')}`, inline: true });
-		embed.addFields({ name: ' ', value: `${col2.join('')}`, inline: true });
+		embed.addFields({ name: ' ', value: `${monsterCache[0].join('')}`, inline: true });
+		embed.addFields({ name: ' ', value: `${monsterCache[1].join('')}`, inline: true });
 
 	}
 	return embed;
@@ -110,16 +162,3 @@ function createButtons() {
 				.setEmoji('➡️'),
 		);
 }
-
-module.exports = {
-	// eslint-disable-next-line no-empty-function
-	async updatePages(interaction) {
-		// await interaction.update({ embeds: [newPages()], components: [createButtons()] });
-		// await interaction.reply({ embeds: [createEmbed()], components: [createButtons()] });
-		currentPage++;
-		await interaction.update({
-			content: `it works ${currentPage}`,
-		});
-	},
-};
-
