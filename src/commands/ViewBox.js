@@ -116,7 +116,7 @@ function createEmbed() {
 	console.log(`[ViewBox] Embed for ${user.username}'s box has ${pages} pages`);
 	embed.setFooter({ text: `Page 1/${pages}` });
 
-	if (pages <= 1) {
+	if (size <= 10) {
 		const col1 = [];
 		res.rows.forEach((mon) => col1.push(`\`${mon.id}\` ${mon.display_name}\n`));
 		embed.addFields({ name: ' ', value: `${col1.join('')}`, inline: true });
