@@ -1,6 +1,6 @@
 /* eslint-disable indent */
 /* eslint-disable brace-style */
-const { Events, MessageComponentInteraction, Client } = require('discord.js');
+const { Events } = require('discord.js');
 
 module.exports = {
 	name: Events.InteractionCreate,
