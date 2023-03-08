@@ -49,6 +49,50 @@ function showMonsterEmbed(user, res, level) {
 	// TODO maybe do OBTAINED AT
 }
 
+function runaway(user, res) {
+	console.log('[RunAwayEmbed] Monster ran away');
+	const name = res.rows[0].display_name;
+	const className = res.rows[0].class;
+	const type = res.rows[0].type;
+	const rarity = res.rows[0].rarity;
+	const img = res.rows[0].img;
+
+	return new EmbedBuilder()
+		.setColor(0x000000)
+		.setAuthor({ name: 'The Monster ran away!', iconURL: 'https://collection-monsters.s3.amazonaws.com/runaway.png' })
+		.setDescription(`**${name}** ran away, ${user.username}!`)
+		.addFields(
+			{ name: 'Class', value: `${className}`, inline: true },
+			{ name: 'Type', value: `${type}`, inline: true },
+			{ name: 'Rarity', value: `${rarity}`, inline: true },
+
+		)
+		.setThumbnail(img);
+}
+
+function catchEmbed(user, res) {
+	console.log('[CatchEmbed] Starting catch game display...');
+	const name = res.rows[0].display_name;
+	const className = res.rows[0].class;
+	const type = res.rows[0].type;
+	const rarity = res.rows[0].rarity;
+	const img = res.rows[0].img;
+
+	return new EmbedBuilder()
+		.setColor(0x0099FF)
+		// .setTitle('A Monster appeared!')
+		.setAuthor({ name: 'A Monster appeared!', iconURL: 'https://collection-monsters.s3.amazonaws.com/tallgrass.png' })
+		.setDescription('Click any of the options below to try and catch it!')
+		.setThumbnail(img)
+		.addFields(
+			{ name: 'Name', value: `${name}`, inline: true },
+			{ name: 'Class', value: `${className}`, inline: true },
+			{ name: 'Type', value: `${type}`, inline: true },
+			{ name: 'Rarity', value: `${rarity}`, inline: true },
+		)
+		.setTimestamp();
+}
+
 function errorEmbed(description) {
 	return new EmbedBuilder()
 		.setColor(0xFE514E)
@@ -68,6 +112,8 @@ function textEmbed(description) {
 module.exports = {
 	monsterEmbed,
 	showMonsterEmbed,
+	runaway,
+	catchEmbed,
 	errorEmbed,
 	textEmbed,
 };

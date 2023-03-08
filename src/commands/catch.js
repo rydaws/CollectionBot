@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { monsterEmbed, errorEmbed, textEmbed } = require('../util/EmbedUtil');
+const { catchEmbed, errorEmbed, runaway } = require('../util/EmbedUtil');
 const { Commands } = require('../CommandList');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
@@ -8,12 +8,15 @@ const { Client } = require('pg');
 let res;
 let size;
 let backpack;
+let ownerId;
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('catch')
 		.setDescription('Encounter a monster and attempt to capture it!'),
 	async execute(interaction) {
 		const client_id = interaction.user.id;
+		ownerId = interaction.user.id;
 
 		const client = new Client(con);
 		await client.connect();
@@ -37,6 +40,7 @@ module.exports = {
 
 			backpack = await client.query(`SELECT mousetrap, net, lasso, beartrap, safe FROM backpack WHERE client_id = ${client_id}`);
 
+			res = await client.query(`SELECT * FROM monsters WHERE id=${roll_id}`);
 			// Begin catch event
 			await catchEvent(interaction);
 
@@ -44,10 +48,10 @@ module.exports = {
 			// await client.query(`INSERT INTO box VALUES (${client_id}, ${roll_id}, 1)`);
 			console.log(`[Catch] Added ${roll_id} to ${interaction.user.username}'s box`);
 
-			res = await client.query(`SELECT * FROM monsters WHERE id=${roll_id}`);
-
+			// We want this to be the runaway, NOT the capture
 			const timeoutId = setTimeout(async () => {
-				await interaction.editReply({ content: `You captured ${res.rows[0].display_name}!`, embeds: [new EmbedBuilder(monsterEmbed(interaction.user, res))] });
+				// await interaction.editReply({ content: `You captured ${res.rows[0].display_name}!`, embeds: [new EmbedBuilder(monsterEmbed(interaction.user, res))] });
+				await interaction.editReply({ content: 'The monster ran away!', embeds: [new EmbedBuilder(runaway(interaction.user, res))], components: [] });
 			}, 5000);
 
 			// clearTimeout(timeoutId);
@@ -67,7 +71,9 @@ async function catchEvent(interaction) {
 	console.log('Catch');
 	const msg = 'Click any of the options at the bottom to attempt capture!';
 
-	await interaction.reply({ content: 'placeholder', embeds: [new EmbedBuilder(textEmbed(msg))], components: [createButtons()] });
+	// await interaction.reply({ content: 'placeholder', embeds: [new EmbedBuilder(textEmbed(msg))], components: [createButtons()] });
+	await interaction.reply({ content: msg, embeds: [new EmbedBuilder(catchEmbed(interaction.user, res))], components: [createButtons()] });
+
 
 	return interaction;
 
@@ -135,4 +141,12 @@ function createButtons() {
 	}
 
 	return buttons;
+}
+
+function catchMousetrap(interaction) {
+
+	if (interaction.user.id !== ownerId) {
+		console.log(`[ViewBox | ERROR] Button client: ${interaction.user.id} does not equal embed client: ${ownerId}`);
+		return;
+	}
 }
