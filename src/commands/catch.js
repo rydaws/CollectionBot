@@ -26,7 +26,7 @@ module.exports = {
 		await catchEvent(interaction);
 
 	},
-	async catchMousetrap(interaction) {
+	async catchAttempt(interaction, device) {
 
 		clearTimeout(timeoutId);
 		if (interaction.user.id !== ownerId) {
@@ -38,28 +38,38 @@ module.exports = {
 
 		console.log('[Catch] - Roll', randomRoll);
 		console.log('[Catch] - Catch rate', caughtMonster.catchRate);
-		if (randomRoll <= caughtMonster.catchRate) {
-			console.log(`[Catch] - SUCCESS Monster blank added to ${ownerId} box`);
-			const client = new Client(con);
-			await client.connect();
+		console.log('[Catch] - Device catch rate', device.catchRate);
+		const totalCatchRate = caughtMonster.catchRate + device.catchRate;
+		console.log('[Catch] - Total catch rate', totalCatchRate);
+		const client = new Client(con);
+		await client.connect();
 
-			try {
 
+		try {
+			if (randomRoll <= totalCatchRate) {
+
+				// Adds Monster to player's box
 				await client.query(`INSERT INTO box VALUES (${ownerId}, ${roll_id}, 1)`);
 				console.log(`[Catch] Added ${roll_id} to ${interaction.user.username}'s box`);
+
+				// Deducts 1 catching device from player's backpack
+				await client.query(`UPDATE backpack SET ${device.name} = (SELECT ${device.name} FROM backpack WHERE client_id = ${ownerId}) - 1 WHERE client_id = ${ownerId}`);
+				console.log(`[Catch] - Deducted 1 ${device.name} from client ${interaction.user.username}`);
+
 				await interaction.update({ content: ' ', embeds: [new EmbedBuilder(successCatch(interaction.user, res))], components: [] });
 			}
-			catch (e) {
-				console.log(`[Catch | ERROR] Failed to catch monster for ${ownerId}.`);
-				await interaction.followUp({ embeds: [new EmbedBuilder(errorEmbed('Error! Please contact staff if this issue persists'))] });
+			else {
+				console.log(`[Catch] - Catch failed for ${ownerId}`);
+				await interaction.update({ content: ' ', embeds: [new EmbedBuilder(badCatch(interaction.user, res))], components: [] });
 			}
+		}
+		catch (e) {
+			console.log(`[Catch | ERROR] Failed to catch monster for ${interaction.user.username}.`);
+			await interaction.followUp({ embeds: [new EmbedBuilder(errorEmbed('Error! Please contact staff if this issue persists'))] });
+		}
 
-			client.end();
-		}
-		else {
-			console.log(`[Catch] - Catch failed for ${ownerId}`);
-			await interaction.update({ content: ' ', embeds: [new EmbedBuilder(badCatch(interaction.user, res))], components: [] });
-		}
+		client.end();
+
 
 	},
 
