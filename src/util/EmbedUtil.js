@@ -1,4 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
+const { fetchMonsterDetails } = require('../monsters/MonsterDetails');
 function monsterEmbed(user, res) {
 	console.log('[DisplayMonster] Starts embed build');
 	const name = res.rows[0].display_name;
@@ -8,7 +9,7 @@ function monsterEmbed(user, res) {
 	const img = res.rows[0].img;
 
 	return new EmbedBuilder()
-		.setColor(0x0099FF)
+		.setColor(fetchMonsterDetails(rarity).color)
 		.setTitle('Monster')
 		.setAuthor({ name: user.username, iconURL: user.avatarURL() })
 		.setDescription('Stats for the monster')
@@ -32,7 +33,6 @@ function showMonsterEmbed(user, res, level) {
 	const img = res.rows[0].img;
 
 	return new EmbedBuilder()
-		.setColor(0x0099FF)
 		.setTitle(`${name}`)
 		// .setAuthor({ name: user.username, iconURL: user.avatarURL() })
 		.setDescription(`Owned by ${user.username}`)
@@ -44,6 +44,7 @@ function showMonsterEmbed(user, res, level) {
 			// TODO maybe change to include 'Obtained: TIME'
 		)
 		.setImage(img)
+		.setColor(fetchMonsterDetails(rarity).color)
 		.setTimestamp();
 	// .setFooter({ text: `Owned by: ${user.username}`, iconURL: user.avatarURL() });
 	// TODO maybe do OBTAINED AT
@@ -79,7 +80,7 @@ function catchEmbed(user, res) {
 	const img = res.rows[0].img;
 
 	return new EmbedBuilder()
-		.setColor(0x0099FF)
+		.setColor(fetchMonsterDetails(rarity).color)
 		// .setTitle('A Monster appeared!')
 		.setAuthor({ name: 'A Monster appeared!', iconURL: 'https://collection-monsters.s3.amazonaws.com/tallgrass.png' })
 		.setDescription('Click any of the options below to try and catch it!')

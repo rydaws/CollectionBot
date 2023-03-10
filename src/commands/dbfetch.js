@@ -3,6 +3,7 @@ const { Client } = require('pg');
 const { con } = require('../util/QueryUtil');
 const dotenv = require('dotenv');
 const { errorEmbed } = require('../util/EmbedUtil');
+const { fetchMonsterDetails } = require('../monsters/MonsterDetails');
 dotenv.config();
 
 let res;
@@ -55,7 +56,7 @@ module.exports = {
 
 function createEmbed() {
 	return new EmbedBuilder()
-		.setColor(0x0099FF)
+		.setColor(fetchMonsterDetails(rarity).color)
 		.setTitle('Queried Monster')
 		.setAuthor({ name: user.username, iconURL: user.avatarURL() })
 		.setDescription('Stats for the monster')
@@ -66,7 +67,5 @@ function createEmbed() {
 			{ name: 'Type', value: `${type}`, inline: true },
 			{ name: 'Rarity', value: `${rarity}`, inline: true },
 		)
-		// .setImage('https://collection-monsters.s3.amazonaws.com/the-dogAvatar.png')
-		.setTimestamp()
-		.setFooter({ text: 'Click options below to capture!' });
+		.setTimestamp();
 }
