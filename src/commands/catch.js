@@ -53,7 +53,7 @@ module.exports = {
 				console.log(`[Catch] Added ${roll_id} to ${interaction.user.username}'s box`);
 
 				// Reward player with shmoins for catch
-				const shmoinsToAdd = Math.floor(Math.random() * (250 - 125 + 1) + 125);
+				const shmoinsToAdd = Math.floor(Math.random() * (250 - 125 + 1) + 125) * caughtMonster.shmoinMulti;
 
 				// Deducts 1 catching device from player's backpack and adds shmoins
 				await client.query(`UPDATE backpack SET ${device.name} = (SELECT ${device.name} FROM backpack WHERE client_id = ${ownerId}) - 1, shmoins = (SELECT shmoins FROM backpack WHERE client_id = ${ownerId}) + ${shmoinsToAdd} WHERE client_id = ${ownerId}`);
