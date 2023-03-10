@@ -91,7 +91,7 @@ function badCatch(user, res) {
 		.setThumbnail(img);
 }
 
-function successCatch(user, res) {
+function successCatch(user, res, shmoinsToAdd) {
 	console.log(`[SuccessCatchEmbed] Monster was caught and added to ${user.username}'s inventory!`);
 	const name = res.rows[0].display_name;
 	const className = res.rows[0].class;
@@ -102,7 +102,7 @@ function successCatch(user, res) {
 	return new EmbedBuilder()
 		.setColor(0x32CD32)
 		.setAuthor({ name: 'You caught the Monster!', iconURL: 'https://collection-monsters.s3.amazonaws.com/success.png' })
-		.setDescription(`**${name}** was added to your box, ${user.username}!`)
+		.setDescription(`**${name}** was added to your box, ${user.username}!\n\nAlso you earned **${shmoinsToAdd}** Shmoins!`)
 		.addFields(
 			{ name: 'Class', value: `${className}`, inline: true },
 			{ name: 'Type', value: `${type}`, inline: true },

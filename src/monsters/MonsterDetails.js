@@ -1,8 +1,8 @@
 const monsters = [
-	{ rarity: 'Bronze', catchRate: 70, encounterRate: 50, color: 0xAF6600 },
-	{ rarity: 'Silver', catchRate: 40, encounterRate: 30, color: 0xCDCDCD },
-	{ rarity: 'Gold', catchRate: 20, encounterRate: 10, color: 0xFFD500 },
-	{ rarity: 'Diamond', catchRate: 5, encounterRate: 3, color: 0x00E3FF },
+	{ rarity: 'Bronze', catchRate: 70, encounterRate: 50, color: 0xAF6600, shmoinMulti: 1 },
+	{ rarity: 'Silver', catchRate: 40, encounterRate: 30, color: 0xCDCDCD, shmoinMulti: 2 },
+	{ rarity: 'Gold', catchRate: 20, encounterRate: 10, color: 0xFFD500, shmoinMulti: 4 },
+	{ rarity: 'Diamond', catchRate: 5, encounterRate: 3, color: 0x00E3FF, shmoinMulti: 8 },
 ];
 
 function fetchMonsterDetails(rarity) {

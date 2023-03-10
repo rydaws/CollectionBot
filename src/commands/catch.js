@@ -52,11 +52,15 @@ module.exports = {
 				await client.query(`INSERT INTO box VALUES (${ownerId}, ${roll_id}, 1)`);
 				console.log(`[Catch] Added ${roll_id} to ${interaction.user.username}'s box`);
 
-				// Deducts 1 catching device from player's backpack
-				await client.query(`UPDATE backpack SET ${device.name} = (SELECT ${device.name} FROM backpack WHERE client_id = ${ownerId}) - 1 WHERE client_id = ${ownerId}`);
-				console.log(`[Catch] - Deducted 1 ${device.name} from client ${interaction.user.username}`);
+				// Reward player with shmoins for catch
+				const shmoinsToAdd = Math.floor(Math.random() * (250 - 125 + 1) + 125);
 
-				await interaction.update({ content: ' ', embeds: [new EmbedBuilder(successCatch(interaction.user, res))], components: [] });
+				// Deducts 1 catching device from player's backpack and adds shmoins
+				await client.query(`UPDATE backpack SET ${device.name} = (SELECT ${device.name} FROM backpack WHERE client_id = ${ownerId}) - 1, shmoins = (SELECT shmoins FROM backpack WHERE client_id = ${ownerId}) + ${shmoinsToAdd} WHERE client_id = ${ownerId}`);
+				console.log(`[Catch] - Deducted 1 ${device.name} from client ${interaction.user.username}`);
+				console.log(`[Catch] - Added ${shmoinsToAdd} to client ${interaction.user.username}`);
+
+				await interaction.update({ content: ' ', embeds: [new EmbedBuilder(successCatch(interaction.user, res, shmoinsToAdd))], components: [] });
 			}
 			else {
 				console.log(`[Catch] - Catch failed for ${ownerId}`);
