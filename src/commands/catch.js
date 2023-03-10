@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { catchEmbed, errorEmbed, runaway } = require('../util/EmbedUtil');
+const { catchEmbed, errorEmbed, runaway, badCatch, successCatch } = require('../util/EmbedUtil');
 const { Commands } = require('../CommandList');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
@@ -45,9 +45,9 @@ module.exports = {
 
 			try {
 
-				// TODO only do if catch event is successful
-				// await client.query(`INSERT INTO box VALUES (${client_id}, ${roll_id}, 1)`);
+				await client.query(`INSERT INTO box VALUES (${ownerId}, ${roll_id}, 1)`);
 				console.log(`[Catch] Added ${roll_id} to ${interaction.user.username}'s box`);
+				await interaction.update({ content: ' ', embeds: [new EmbedBuilder(successCatch(interaction.user, res))], components: [] });
 			}
 			catch (e) {
 				console.log(`[Catch | ERROR] Failed to catch monster for ${ownerId}.`);
@@ -57,8 +57,8 @@ module.exports = {
 			client.end();
 		}
 		else {
-			// TODO embed for fail
-			console.log('you failed ur catch');
+			console.log(`[Catch] - Catch failed for ${ownerId}`);
+			await interaction.update({ content: ' ', embeds: [new EmbedBuilder(badCatch(interaction.user, res))], components: [] });
 		}
 
 	},
@@ -66,14 +66,13 @@ module.exports = {
 };
 
 async function catchEvent(interaction) {
-	console.log('Catch');
+	console.log(`[Catch] - Begin Catch Event for ${ownerId}`);
 
 	// Adds up all the encounter rates for the rarities
 	const totalCatchRate = monsters.reduce((sum, monster) => sum + monster.encounterRate, 0);
 
 	// Determines random roll based on total encounter rate
 	let randomRoll = Math.floor(Math.random() * totalCatchRate) + 1;
-	console.log(randomRoll);
 
 	// Iterates through all objects, the lowest chance is hardest to obtain as the roll has to be
 	// lower than or equal to the encounter rate of the index.
@@ -85,9 +84,9 @@ async function catchEvent(interaction) {
 		randomRoll -= monsters[i].encounterRate;
 	}
 
-	console.log(randomRoll);
-	console.log('You caught:', caughtMonster.rarity);
+	console.log(`[Catch] - Rarity ${caughtMonster.rarity} chosen.`);
 
+	// Establish DB connection
 	const client = new Client(con);
 	await client.connect();
 
@@ -96,39 +95,39 @@ async function catchEvent(interaction) {
 		// Select monster that user does not already own
 		potentialMonsters = await client.query(`SELECT id from monsters WHERE id not in (SELECT id from box where client_id=${interaction.user.id}) AND rarity = '${caughtMonster.rarity}'`);
 
+		// Populate backpack elements to see what catching devices are available
 		backpack = await client.query(`SELECT mousetrap, net, lasso, beartrap, safe FROM backpack WHERE client_id = ${ownerId}`);
 
-		// If the list returned is 0, user has all the monster
+		// If the potentialMonsters returned is 0, user has all the monsters
 		size = Object.keys(potentialMonsters.rows).length;
 
+		// TODO instead, have it reroll until a monster is found?
 		// Cancel catch interaction
 		if (size === 0) {
-			console.log(5);
 			console.log(`[Catch | ERROR] Client ${ownerId} owns all monsters.`);
-			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You already own all of the monsters! Focus on training them with ${Commands.quest}`))] });
+			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You already own all of the monsters of the ${caughtMonster.rarity} rarity! Focus on training them with ${Commands.quest}`))] });
 			return;
 		}
-		console.log(6);
 
 		// ID of monster to display for catch event
 		roll_id = potentialMonsters.rows[Math.floor(Math.random() * (size))].id;
-		console.log(7);
+
 		res = await client.query(`SELECT * FROM monsters WHERE id=${roll_id}`);
-		console.log(8);
+
 		timeoutId = setTimeout(async () => {
-			console.log(9);
 			// await interaction.editReply({ content: `You captured ${res.rows[0].display_name}!`, embeds: [new EmbedBuilder(monsterEmbed(interaction.user, res))] });
 			await interaction.editReply({ content: 'The monster ran away!', embeds: [new EmbedBuilder(runaway(interaction.user, res))], components: [] });
 		}, 5000);
-		console.log(10);
+
 		const msg = 'Click any of the options at the bottom to attempt capture!';
-		console.log(11);
-		// await interaction.reply({ content: 'placeholder', embeds: [new EmbedBuilder(textEmbed(msg))], components: [createButtons()] });
+
+		console.log(10);
 		await interaction.reply({ content: msg, embeds: [new EmbedBuilder(catchEmbed(interaction.user, res))], components: [createButtons()] });
-		console.log(12);
+
 	}
 	catch (e) {
-		console.log('no monsters w that rarity');
+		console.log(`[Catch | ERROR] - No monsters found with ${caughtMonster.rarity}`);
+		clearTimeout(timeoutId);
 	}
 
 }
