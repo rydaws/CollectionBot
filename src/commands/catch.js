@@ -36,8 +36,8 @@ module.exports = {
 
 		const randomRoll = Math.random() * 100;
 
-		console.log('Roll', randomRoll);
-		console.log('Catch rate', caughtMonster.catchRate);
+		console.log('[Catch] - Roll', randomRoll);
+		console.log('[Catch] - Catch rate', caughtMonster.catchRate);
 		if (randomRoll <= caughtMonster.catchRate) {
 			console.log(`[Catch] - SUCCESS Monster blank added to ${ownerId} box`);
 			const client = new Client(con);
