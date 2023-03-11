@@ -135,7 +135,6 @@ async function catchEvent(interaction) {
 
 		const msg = 'Click any of the options at the bottom to attempt capture!';
 
-		console.log(10);
 		await interaction.reply({ content: msg, embeds: [new EmbedBuilder(catchEmbed(interaction.user, res))], components: [createButtons()] });
 
 	}
