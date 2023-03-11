@@ -23,9 +23,19 @@ async function getData() {
 		method: 'GET',
 		headers: {
 			'X-RapidAPI-Key': '2da3766b95msh2139338b76a7610p16db86jsn0dea0c0042f2',
-			'X-RapidAPI-Host': 'dad-jokes.p.rapidapi.com'
+			'X-RapidAPI-Host': 'dad-jokes.p.rapidapi.com',
 		},
 	};
-	const res = await fetch('https://dad-jokes.p.rapidapi.com/random/joke', options);
-	return res.json();
+	const res2 = await fetch('https://dad-jokes.p.rapidapi.com/random/joke', options);
+
+	// eslint-disable-next-line no-unused-vars
+	let res;
+	await fetch('https://dummyjson.com/products')
+		.then(response => response.json())
+		.then(json => {
+			res = json;
+		});
+	// console.log(res.products[0].title);
+
+	return res2.json();
 }

@@ -1,4 +1,5 @@
 const { EmbedBuilder } = require('discord.js');
+const { fetchMonsterDetails } = require('../monsters/MonsterDetails');
 function monsterEmbed(user, res) {
 	console.log('[DisplayMonster] Starts embed build');
 	const name = res.rows[0].display_name;
@@ -8,7 +9,7 @@ function monsterEmbed(user, res) {
 	const img = res.rows[0].img;
 
 	return new EmbedBuilder()
-		.setColor(0x0099FF)
+		.setColor(fetchMonsterDetails(rarity).color)
 		.setTitle('Monster')
 		.setAuthor({ name: user.username, iconURL: user.avatarURL() })
 		.setDescription('Stats for the monster')
@@ -20,7 +21,6 @@ function monsterEmbed(user, res) {
 			{ name: 'Rarity', value: `${rarity}`, inline: true },
 		)
 		.setTimestamp();
-	// .setFooter({ text: 'Click options below to capture!' });
 }
 
 function showMonsterEmbed(user, res, level) {
@@ -32,7 +32,6 @@ function showMonsterEmbed(user, res, level) {
 	const img = res.rows[0].img;
 
 	return new EmbedBuilder()
-		.setColor(0x0099FF)
 		.setTitle(`${name}`)
 		// .setAuthor({ name: user.username, iconURL: user.avatarURL() })
 		.setDescription(`Owned by ${user.username}`)
@@ -44,9 +43,96 @@ function showMonsterEmbed(user, res, level) {
 			// TODO maybe change to include 'Obtained: TIME'
 		)
 		.setImage(img)
-		.setTimestamp();
-	// .setFooter({ text: `Owned by: ${user.username}`, iconURL: user.avatarURL() });
+		.setColor(fetchMonsterDetails(rarity).color)
+		.setTimestamp()
+		.setFooter({ text: `Owned by: ${user.username}`, iconURL: user.avatarURL() });
 	// TODO maybe do OBTAINED AT
+}
+
+function runaway(user, res) {
+	console.log('[RunAwayEmbed] Monster ran away');
+	const name = res.rows[0].display_name;
+	const className = res.rows[0].class;
+	const type = res.rows[0].type;
+	const rarity = res.rows[0].rarity;
+	const img = res.rows[0].img;
+
+	return new EmbedBuilder()
+		.setColor(0x000000)
+		.setAuthor({ name: 'The Monster ran away!', iconURL: 'https://collection-monsters.s3.amazonaws.com/runaway.png' })
+		.setDescription(`**${name}** ran away, ${user.username}!`)
+		.addFields(
+			{ name: 'Class', value: `${className}`, inline: true },
+			{ name: 'Type', value: `${type}`, inline: true },
+			{ name: 'Rarity', value: `${rarity}`, inline: true },
+
+		)
+		.setThumbnail(img);
+}
+
+function badCatch(user, res) {
+	console.log('[BadCatchEmbed] Monster broke free and ran away');
+	const name = res.rows[0].display_name;
+	const className = res.rows[0].class;
+	const type = res.rows[0].type;
+	const rarity = res.rows[0].rarity;
+	const img = res.rows[0].img;
+
+	return new EmbedBuilder()
+		.setColor(0xC70039)
+		.setAuthor({ name: 'The Monster broke free!!', iconURL: 'https://collection-monsters.s3.amazonaws.com/breakout.png' })
+		.setDescription(`**${name}** broke free and ran away, ${user.username}!`)
+		.addFields(
+			{ name: 'Class', value: `${className}`, inline: true },
+			{ name: 'Type', value: `${type}`, inline: true },
+			{ name: 'Rarity', value: `${rarity}`, inline: true },
+
+		)
+		.setThumbnail(img);
+}
+
+function successCatch(user, res, shmoinsToAdd) {
+	console.log(`[SuccessCatchEmbed] Monster was caught and added to ${user.username}'s inventory!`);
+	const name = res.rows[0].display_name;
+	const className = res.rows[0].class;
+	const type = res.rows[0].type;
+	const rarity = res.rows[0].rarity;
+	const img = res.rows[0].img;
+
+	return new EmbedBuilder()
+		.setColor(0x32CD32)
+		.setAuthor({ name: 'You caught the Monster!', iconURL: 'https://collection-monsters.s3.amazonaws.com/success.png' })
+		.setDescription(`**${name}** was added to your box, ${user.username}!\n\nAlso you earned **${shmoinsToAdd}** Shmoins!`)
+		.addFields(
+			{ name: 'Class', value: `${className}`, inline: true },
+			{ name: 'Type', value: `${type}`, inline: true },
+			{ name: 'Rarity', value: `${rarity}`, inline: true },
+
+		)
+		.setThumbnail(img);
+}
+
+function catchEmbed(user, res) {
+	console.log('[CatchEmbed] Starting catch game display...');
+	const name = res.rows[0].display_name;
+	const className = res.rows[0].class;
+	const type = res.rows[0].type;
+	const rarity = res.rows[0].rarity;
+	const img = res.rows[0].img;
+
+	return new EmbedBuilder()
+		.setColor(fetchMonsterDetails(rarity).color)
+		.setAuthor({ name: 'A Monster appeared!', iconURL: 'https://collection-monsters.s3.amazonaws.com/tallgrass.png' })
+		.setDescription(`**${user.username}** found a wild **${name}!**`)
+		.setThumbnail(img)
+		.addFields(
+			{ name: 'Name', value: `${name}`, inline: true },
+			{ name: 'Class', value: `${className}`, inline: true },
+			{ name: 'Type', value: `${type}`, inline: true },
+			{ name: 'Rarity', value: `${rarity}`, inline: true },
+		)
+		.setFooter({ text: 'Click any of the options below to try and catch it!' })
+		.setTimestamp();
 }
 
 function errorEmbed(description) {
@@ -68,6 +154,10 @@ function textEmbed(description) {
 module.exports = {
 	monsterEmbed,
 	showMonsterEmbed,
+	runaway,
+	catchEmbed,
+	badCatch,
+	successCatch,
 	errorEmbed,
 	textEmbed,
 };

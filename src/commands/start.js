@@ -24,6 +24,7 @@ module.exports = {
 			// }
 			console.log(`[Start] Adding if not exists ${id}`);
 			await client.query(`INSERT INTO player VALUES (${id}, DEFAULT) ON CONFLICT (client_id) DO NOTHING`);
+			await client.query(`INSERT INTO backpack VALUES (${id}, 100, DEFAULT, DEFAULT, DEFAULT, DEFAULT) ON CONFLICT (client_id) DO NOTHING`);
 
 			// TODO Will have to update inventory at this point!
 

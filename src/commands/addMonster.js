@@ -27,7 +27,7 @@ module.exports = {
 			const monster_name = res.rows[0].display_name;
 
 			console.log(`[AddMonster] Added ${monster_name} with id ${monster_id} to client ${client_id}'s box.`);
-			await interaction.reply({ embeds: [new EmbedBuilder(textEmbed('Added ${monster_name} to your box'))] });
+			await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Added ${monster_name} to your box`))] });
 
 		}
 		catch (error) {
