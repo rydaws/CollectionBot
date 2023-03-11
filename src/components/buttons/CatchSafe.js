@@ -1,5 +1,5 @@
 const { catchAttempt } = require('../../commands/catch');
-const { safe } = require('../../monsters/CatchingGear');
+const { safe } = require('../../shop/CatchingGear');
 module.exports = {
 	data: {
 		name: 'catch_safe',

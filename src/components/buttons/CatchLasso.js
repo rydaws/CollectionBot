@@ -1,5 +1,5 @@
 const { catchAttempt } = require('../../commands/catch');
-const { lasso } = require('../../monsters/CatchingGear');
+const { lasso } = require('../../shop/CatchingGear');
 module.exports = {
 	data: {
 		name: 'catch_lasso',
