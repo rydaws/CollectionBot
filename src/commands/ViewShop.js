@@ -2,7 +2,13 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const itemList = require('../shop/ItemList');
+const capitalize = require('../util/StringUtil');
+const { errorEmbed } = require('../util/EmbedUtil');
+const { Commands } = require('../CommandList');
 
+
+let user;
+let backpack;
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -26,19 +32,19 @@ module.exports = {
 						.setRequired(true))),
 
 	async execute(interaction) {
-		const client_id = interaction.user.id;
-		if (interaction.options.getSubcommand() === 'view') {
-			await interaction.reply({ embeds: [createEmbed()] });
-
-		}
+		user = interaction.user;
 
 		const client = new Client(con);
 		await client.connect();
 
-		try {
+		if (interaction.options.getSubcommand() === 'view') {
+			try {
+				await interaction.reply({ embeds: [createEmbed()] });
+			}
+			catch (error) {
+				await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Shop Error! Please contact staff!'))] });
 
-		}
-		catch (error) {
+			}
 
 		}
 
@@ -52,17 +58,33 @@ function createEmbed() {
 
 	const embed = new EmbedBuilder()
 		.setColor(0x0099FF)
-		.setAuthor({ name: 'Shop' })
+		.setAuthor({ name: 'Shop', iconURL: user.avatarURL() })
 		.setDescription('**View my wares...**')
 		.setTimestamp();
 
 	const col = [];
-	itemList.forEach((item) => {
-		col.push(`\`${item.id}\` ${item.name}\n`);
-	});
+
+	col.push('═════════ Catching ═════════\n');
+	itemList.forEach((item) => col.push(`\`${item.id}\` ${item.emoji} \`${capitalize(item.name)} ${addWhitespace(item)} ${item.price} Shmoins\`\n`));
 
 	embed.addFields({ name: ' ', value: `${col.join('')}`, inline: true });
 
 	return embed;
 }
 
+function addWhitespace(item) {
+	const max = 30;
+
+	// Length of current items
+	const entire = item.id.toString().length + 1 + item.name.length + item.price.toString().length + 'Shmoins'.length;
+
+	// Amount of whitespace to add
+	const length = max - entire;
+
+	let whitespace = '';
+	for (let i = 0; i < length; i++) {
+		whitespace = whitespace + ' ';
+	}
+
+	return whitespace;
+}

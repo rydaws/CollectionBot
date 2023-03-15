@@ -4,6 +4,7 @@ const { Commands } = require('../CommandList');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const { monsters } = require('../monsters/MonsterDetails');
+const { mousetrap, net, lasso, beartrap, safe } = require('../shop/CatchingGear');
 
 
 let res;
@@ -149,50 +150,50 @@ function createButtons() {
 
 	// Do inventory check before displaying available catch devices.
 	const buttons = new ActionRowBuilder();
-	const mousetrap = backpack.rows[0].mousetrap;
-	const net = backpack.rows[0].net;
-	const lasso = backpack.rows[0].lasso;
-	const beartrap = backpack.rows[0].beartrap;
-	const safe = backpack.rows[0].safe;
+	const mousetrapAmt = backpack.rows[0].mousetrap;
+	const netAmt = backpack.rows[0].net;
+	const lassoAmt = backpack.rows[0].lasso;
+	const beartrapAmt = backpack.rows[0].beartrap;
+	const safeAmt = backpack.rows[0].safe;
 
-	if (mousetrap > 0) {
+	if (mousetrapAmt > 0) {
 		buttons.addComponents(
 			new ButtonBuilder()
 				.setCustomId('catch_mousetrap')
 				.setStyle(ButtonStyle.Secondary)
-				.setEmoji('<:mousetrap:1082044930677031032>'),
+				.setEmoji(mousetrap.emoji),
 		);
 	}
-	if (net > 0) {
+	if (netAmt > 0) {
 		buttons.addComponents(
 			new ButtonBuilder()
 				.setCustomId('catch_net')
 				.setStyle(ButtonStyle.Secondary)
-				.setEmoji('2️⃣'),
+				.setEmoji(net.emoji),
 		);
 	}
-	if (lasso > 0) {
+	if (lassoAmt > 0) {
 		buttons.addComponents(
 			new ButtonBuilder()
 				.setCustomId('catch_lasso')
 				.setStyle(ButtonStyle.Secondary)
-				.setEmoji('3️⃣'),
+				.setEmoji(lasso.emoji),
 		);
 	}
-	if (beartrap > 0) {
+	if (beartrapAmt > 0) {
 		buttons.addComponents(
 			new ButtonBuilder()
 				.setCustomId('catch_beartrap')
 				.setStyle(ButtonStyle.Secondary)
-				.setEmoji('4️⃣'),
+				.setEmoji(beartrap.emoji),
 		);
 	}
-	if (safe > 0) {
+	if (safeAmt > 0) {
 		buttons.addComponents(
 			new ButtonBuilder()
 				.setCustomId('catch_safe')
 				.setStyle(ButtonStyle.Secondary)
-				.setEmoji('5️⃣'),
+				.setEmoji(safe.emoji),
 		);
 	}
 
