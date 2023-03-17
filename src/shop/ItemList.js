@@ -1,7 +1,21 @@
 const { mousetrap, net, lasso, safe, beartrap } = require('./CatchingGear');
 
-const itemList = [
+const potentialItems = [
 	mousetrap, net, lasso, beartrap, safe,
 ];
 
-module.exports = itemList;
+let itemList = [];
+
+function refreshItems() {
+	itemList = [];
+	potentialItems.forEach((item) => {
+		if (item.enabled) {
+			itemList.push(item);
+		}
+	});
+	return itemList;
+}
+
+module.exports = {
+	refreshItems,
+};

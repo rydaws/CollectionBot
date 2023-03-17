@@ -1,14 +1,13 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
-const itemList = require('../shop/ItemList');
 const capitalize = require('../util/StringUtil');
 const { errorEmbed } = require('../util/EmbedUtil');
-const { Commands } = require('../CommandList');
+const { refreshItems } = require('../shop/ItemList');
 
 
 let user;
-let backpack;
+let shmoins;
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -34,12 +33,16 @@ module.exports = {
 	async execute(interaction) {
 		user = interaction.user;
 
+		// Refreshes item list
+		const itemList = refreshItems();
+
 		const client = new Client(con);
 		await client.connect();
 
 		if (interaction.options.getSubcommand() === 'view') {
 			try {
-				await interaction.reply({ embeds: [createEmbed()] });
+				shmoins = await client.query(`SELECT shmoins FROM backpack WHERE client_id = ${user.id}`);
+				await interaction.reply({ embeds: [createEmbed(itemList)] });
 			}
 			catch (error) {
 				await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Shop Error! Please contact staff!'))] });
@@ -54,7 +57,7 @@ module.exports = {
 
 };
 
-function createEmbed() {
+function createEmbed(itemList) {
 
 	const embed = new EmbedBuilder()
 		.setColor(0x0099FF)
@@ -64,6 +67,9 @@ function createEmbed() {
 
 	const col = [];
 
+	col.push(`**${user.username}'s Shmoins:** ${shmoins.rows[0].shmoins}\n\n`);
+
+	// TODO make this it's own category? Easier way to enable and disable items?
 	col.push('═════════ Catching ═════════\n');
 	itemList.forEach((item) => col.push(`\`${item.id}\` ${item.emoji} \`${capitalize(item.name)} ${addWhitespace(item)} ${item.price} Shmoins\`\n`));
 
@@ -73,7 +79,7 @@ function createEmbed() {
 }
 
 function addWhitespace(item) {
-	const max = 30;
+	const max = 28;
 
 	// Length of current items
 	const entire = item.id.toString().length + 1 + item.name.length + item.price.toString().length + 'Shmoins'.length;
