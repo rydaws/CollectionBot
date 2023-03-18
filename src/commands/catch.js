@@ -117,6 +117,7 @@ async function catchEvent(interaction) {
 		size = Object.keys(potentialMonsters.rows).length;
 
 		// TODO instead, have it reroll until a monster is found?
+
 		// Cancel catch interaction
 		if (size === 0) {
 			console.log(`[Catch | ERROR] Client ${ownerId} owns all monsters.`);

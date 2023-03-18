@@ -1,5 +1,6 @@
-const { SlashCommandBuilder, PermissionsBitField } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { setActive } = require('../../shop/CatchingGear');
+const { errorEmbed } = require('../../util/EmbedUtil');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -23,6 +24,20 @@ module.exports = {
 	async execute(interaction) {
 		const trap = interaction.options.getString('trap');
 		const activity = interaction.options.getBoolean('activity');
+
+		const member = interaction.member;
+
+		// TODO can have bot make a role to check for to enable any server to function with bot
+		// Checks that member is Staff, otherwise deny.
+		if (!member.roles.cache.some(role => role.name === 'Staff')) {
+			console.log('No perms');
+			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('You do not have permission!'))] });
+
+			setTimeout(async () => {
+				await interaction.deleteReply();
+			}, 5000);
+			return;
+		}
 
 		setActive(trap, activity);
 

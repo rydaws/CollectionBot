@@ -27,8 +27,26 @@ function setActive(trap, activity) {
 	}
 }
 
+function getTrap(item_name) {
+	item_name = item_name.toString().toUpperCase();
+
+	switch (item_name) {
+	case 'MOUSETRAP':
+		return mousetrap;
+	case 'NET':
+		return net;
+	case 'LASSO':
+		return lasso;
+	case 'BEARTRAP':
+		return beartrap;
+	case 'SAFE':
+		return safe;
+	}
+}
+
 module.exports = {
 	setActive,
+	getTrap,
 	mousetrap,
 	net,
 	lasso,
