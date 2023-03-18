@@ -56,7 +56,7 @@ module.exports = {
 				// Reward player with shmoins for catch
 				const shmoinsToAdd = Math.floor(Math.random() * (250 - 125 + 1) + 125) * caughtMonster.shmoinMulti;
 
-				// Deducts 1 catching device from player's backpack and adds shmoins
+				// Deducts 1 trap from player's backpack and adds shmoins
 				await client.query(`UPDATE backpack SET ${device.name} = (SELECT ${device.name} FROM backpack WHERE client_id = ${ownerId}) - 1, shmoins = (SELECT shmoins FROM backpack WHERE client_id = ${ownerId}) + ${shmoinsToAdd} WHERE client_id = ${ownerId}`);
 				console.log(`[Catch] - Deducted 1 ${device.name} from client ${interaction.user.username}`);
 				console.log(`[Catch] - Added ${shmoinsToAdd} to client ${interaction.user.username}`);
@@ -110,7 +110,7 @@ async function catchEvent(interaction) {
 		// Select monster that user does not already own
 		potentialMonsters = await client.query(`SELECT id from monsters WHERE id not in (SELECT id from box where client_id=${interaction.user.id}) AND rarity = '${caughtMonster.rarity}'`);
 
-		// Populate backpack elements to see what catching devices are available
+		// Populate backpack elements to see what traps are available
 		backpack = await client.query(`SELECT mousetrap, net, lasso, beartrap, safe FROM backpack WHERE client_id = ${ownerId}`);
 
 		// If the potentialMonsters returned is 0, user has all the monsters

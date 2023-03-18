@@ -4,7 +4,31 @@ const lasso = { id: 3, name: 'lasso', catchRate: 35, emoji: '3️⃣', price: 50
 const beartrap = { id: 4, name: 'beartrap', catchRate: 50, emoji: '4️⃣', price: 2500, enabled: true };
 const safe = { id: 5, name: 'safe', catchRate: 100, emoji: '5️⃣', price: 10000, enabled: true };
 
+// TODO add capability to change catchRate and price
+function setActive(trap, activity) {
+	trap = trap.toString().toUpperCase();
+
+	switch (trap) {
+	case 'MOUSETRAP':
+		mousetrap.enabled = activity;
+		break;
+	case 'NET':
+		net.enabled = activity;
+		break;
+	case 'LASSO':
+		lasso.enabled = activity;
+		break;
+	case 'BEARTRAP':
+		beartrap.enabled = activity;
+		break;
+	case 'SAFE':
+		safe.enabled = activity;
+		break;
+	}
+}
+
 module.exports = {
+	setActive,
 	mousetrap,
 	net,
 	lasso,
