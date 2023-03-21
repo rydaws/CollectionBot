@@ -4,6 +4,7 @@ const { Commands } = require('../CommandList');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const { monsters } = require('../monsters/MonsterDetails');
+const { mousetrap, net, lasso, beartrap, safe } = require('../shop/Traps');
 
 
 let res;
@@ -55,7 +56,7 @@ module.exports = {
 				// Reward player with shmoins for catch
 				const shmoinsToAdd = Math.floor(Math.random() * (250 - 125 + 1) + 125) * caughtMonster.shmoinMulti;
 
-				// Deducts 1 catching device from player's backpack and adds shmoins
+				// Deducts 1 trap from player's backpack and adds shmoins
 				await client.query(`UPDATE backpack SET ${device.name} = (SELECT ${device.name} FROM backpack WHERE client_id = ${ownerId}) - 1, shmoins = (SELECT shmoins FROM backpack WHERE client_id = ${ownerId}) + ${shmoinsToAdd} WHERE client_id = ${ownerId}`);
 				console.log(`[Catch] - Deducted 1 ${device.name} from client ${interaction.user.username}`);
 				console.log(`[Catch] - Added ${shmoinsToAdd} to client ${interaction.user.username}`);
@@ -73,7 +74,6 @@ module.exports = {
 		}
 
 		client.end();
-
 
 	},
 
@@ -109,17 +109,19 @@ async function catchEvent(interaction) {
 		// Select monster that user does not already own
 		potentialMonsters = await client.query(`SELECT id from monsters WHERE id not in (SELECT id from box where client_id=${interaction.user.id}) AND rarity = '${caughtMonster.rarity}'`);
 
-		// Populate backpack elements to see what catching devices are available
+		// Populate backpack elements to see what traps are available
 		backpack = await client.query(`SELECT mousetrap, net, lasso, beartrap, safe FROM backpack WHERE client_id = ${ownerId}`);
 
 		// If the potentialMonsters returned is 0, user has all the monsters
 		size = Object.keys(potentialMonsters.rows).length;
 
 		// TODO instead, have it reroll until a monster is found?
+		// Notes: infinite roll if we just recall function, will have to revist
+
 		// Cancel catch interaction
 		if (size === 0) {
 			console.log(`[Catch | ERROR] Client ${ownerId} owns all monsters.`);
-			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You already own all of the monsters of the ${caughtMonster.rarity} rarity! Focus on training them with ${Commands.quest}`))] });
+			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You already own all monsters of the ${caughtMonster.rarity} rarity! Focus on training them with ${Commands.quest}`))] });
 			return;
 		}
 
@@ -149,50 +151,50 @@ function createButtons() {
 
 	// Do inventory check before displaying available catch devices.
 	const buttons = new ActionRowBuilder();
-	const mousetrap = backpack.rows[0].mousetrap;
-	const net = backpack.rows[0].net;
-	const lasso = backpack.rows[0].lasso;
-	const beartrap = backpack.rows[0].beartrap;
-	const safe = backpack.rows[0].safe;
+	const mousetrapAmt = backpack.rows[0].mousetrap;
+	const netAmt = backpack.rows[0].net;
+	const lassoAmt = backpack.rows[0].lasso;
+	const beartrapAmt = backpack.rows[0].beartrap;
+	const safeAmt = backpack.rows[0].safe;
 
-	if (mousetrap > 0) {
+	if (mousetrapAmt > 0) {
 		buttons.addComponents(
 			new ButtonBuilder()
 				.setCustomId('catch_mousetrap')
 				.setStyle(ButtonStyle.Secondary)
-				.setEmoji('<:mousetrap:1082044930677031032>'),
+				.setEmoji(mousetrap.emoji),
 		);
 	}
-	if (net > 0) {
+	if (netAmt > 0) {
 		buttons.addComponents(
 			new ButtonBuilder()
 				.setCustomId('catch_net')
 				.setStyle(ButtonStyle.Secondary)
-				.setEmoji('2️⃣'),
+				.setEmoji(net.emoji),
 		);
 	}
-	if (lasso > 0) {
+	if (lassoAmt > 0) {
 		buttons.addComponents(
 			new ButtonBuilder()
 				.setCustomId('catch_lasso')
 				.setStyle(ButtonStyle.Secondary)
-				.setEmoji('3️⃣'),
+				.setEmoji(lasso.emoji),
 		);
 	}
-	if (beartrap > 0) {
+	if (beartrapAmt > 0) {
 		buttons.addComponents(
 			new ButtonBuilder()
 				.setCustomId('catch_beartrap')
 				.setStyle(ButtonStyle.Secondary)
-				.setEmoji('4️⃣'),
+				.setEmoji(beartrap.emoji),
 		);
 	}
-	if (safe > 0) {
+	if (safeAmt > 0) {
 		buttons.addComponents(
 			new ButtonBuilder()
 				.setCustomId('catch_safe')
 				.setStyle(ButtonStyle.Secondary)
-				.setEmoji('5️⃣'),
+				.setEmoji(safe.emoji),
 		);
 	}
 

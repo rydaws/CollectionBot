@@ -17,6 +17,7 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('box')
 		.setDescription('Shows your box of monsters')
+		// TODO make user option
 		.addStringOption(option =>
 			option.setName('client_id')
 				.setDescription('User\'s box you\'d like to view')),

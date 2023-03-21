@@ -3,4 +3,5 @@ module.exports.Commands = {
 	catch: '`/catch`',
 	show: '`/show [id]`',
 	quest: '`/quest start`',
+	shop: ['`/shop view`', '`/shop buy`'],
 };

@@ -1,5 +1,5 @@
 const { catchAttempt } = require('../../commands/catch');
-const { mousetrap } = require('../../monsters/CatchingGear');
+const { mousetrap } = require('../../shop/Traps');
 module.exports = {
 	data: {
 		name: 'catch_mousetrap',
