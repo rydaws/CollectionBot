@@ -1,4 +1,4 @@
-const { mousetrap, net, lasso, safe, beartrap } = require('./CatchingGear');
+const { mousetrap, net, lasso, beartrap, safe } = require('./Traps');
 
 const potentialItems = [
 	mousetrap, net, lasso, beartrap, safe,
@@ -16,6 +16,11 @@ function refreshItems() {
 	return itemList;
 }
 
+function getAllItems() {
+	return potentialItems;
+}
+
 module.exports = {
 	refreshItems,
+	getAllItems,
 };

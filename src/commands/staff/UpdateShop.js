@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { setActive } = require('../../shop/CatchingGear');
+const { setActive, getAllTraps } = require('../../shop/Traps');
 const { errorEmbed } = require('../../util/EmbedUtil');
 
 module.exports = {
@@ -16,6 +16,7 @@ module.exports = {
 					{ name: 'Lasso', value: 'lasso' },
 					{ name: 'Beartrap', value: 'beartrap' },
 					{ name: 'Safe', value: 'safe' },
+					{ name: 'all', value: 'all' },
 				))
 		.addBooleanOption(option =>
 			option.setName('activity')
@@ -36,6 +37,15 @@ module.exports = {
 			setTimeout(async () => {
 				await interaction.deleteReply();
 			}, 5000);
+			return;
+		}
+
+		const trapList = getAllTraps();
+
+		if (trap === 'all') {
+
+			trapList.forEach((traps) => traps.enabled = activity);
+			await interaction.reply(`All traps set to ${activity}`);
 			return;
 		}
 

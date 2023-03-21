@@ -44,9 +44,14 @@ function getTrap(item_name) {
 	}
 }
 
+function getAllTraps() {
+	return [mousetrap, net, lasso, beartrap, safe];
+}
+
 module.exports = {
 	setActive,
 	getTrap,
+	getAllTraps,
 	mousetrap,
 	net,
 	lasso,

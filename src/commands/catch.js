@@ -4,7 +4,7 @@ const { Commands } = require('../CommandList');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const { monsters } = require('../monsters/MonsterDetails');
-const { mousetrap, net, lasso, beartrap, safe } = require('../shop/CatchingGear');
+const { mousetrap, net, lasso, beartrap, safe } = require('../shop/Traps');
 
 
 let res;
@@ -75,7 +75,6 @@ module.exports = {
 
 		client.end();
 
-
 	},
 
 };
@@ -117,11 +116,12 @@ async function catchEvent(interaction) {
 		size = Object.keys(potentialMonsters.rows).length;
 
 		// TODO instead, have it reroll until a monster is found?
+		// Notes: infinite roll if we just recall function, will have to revist
 
 		// Cancel catch interaction
 		if (size === 0) {
 			console.log(`[Catch | ERROR] Client ${ownerId} owns all monsters.`);
-			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You already own all of the monsters of the ${caughtMonster.rarity} rarity! Focus on training them with ${Commands.quest}`))] });
+			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You already own all monsters of the ${caughtMonster.rarity} rarity! Focus on training them with ${Commands.quest}`))] });
 			return;
 		}
 

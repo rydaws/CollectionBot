@@ -1,5 +1,5 @@
 const { catchAttempt } = require('../../commands/catch');
-const { net } = require('../../shop/CatchingGear');
+const { net } = require('../../shop/Traps');
 module.exports = {
 	data: {
 		name: 'catch_net',

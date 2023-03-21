@@ -4,7 +4,7 @@ const { Client } = require('pg');
 const capitalize = require('../util/StringUtil');
 const { errorEmbed } = require('../util/EmbedUtil');
 const { refreshItems } = require('../shop/ItemList');
-const { getTrap } = require('../shop/CatchingGear');
+const { getTrap } = require('../shop/Traps');
 const { Commands } = require('../CommandList');
 
 
@@ -111,9 +111,14 @@ function createEmbed(itemList) {
 
 	col.push(`**${user.username}'s Shmoins:** ${shmoins}\n\n`);
 
-	// TODO make this it's own category? Easier way to enable and disable items?
-	col.push('═════════ Catching ═════════\n');
-	itemList.forEach((item) => col.push(`${item.emoji} \`${capitalize(item.name)} ${addWhitespace(item)} ${item.price} Shmoins\`\n`));
+	// Section will collapse if no items are enabled
+	if (itemList.length > 0) {
+		// Section header
+		col.push('══════════ Traps ══════════\n');
+
+		// Adds all catching items to embed field
+		itemList.forEach((item) => col.push(`${item.emoji} \`${capitalize(item.name)} ${addWhitespace(item)} ${item.price} Shmoins\`\n`));
+	}
 
 	embed.addFields({ name: ' ', value: `${col.join('')}`, inline: true });
 
