@@ -3,11 +3,16 @@ const path = require('node:path');
 // Require the necessary discord.js classes
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
+const { deploy } = require('./deploy-commands');
 
 // Create a new client instance
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+
+// Deploys commands
+
+deploy();
 
 for (const file of eventFiles) {
 	const filePath = path.join(eventsPath, file);
