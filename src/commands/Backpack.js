@@ -37,20 +37,24 @@ function backpackEmbed(backpack) {
 
 	const col = [];
 
+	const shmoins = backpack.rows[0].shmoins;
+
+	col.push(`**${user.username}'s Shmoins:** ${shmoins}\n\n`);
+
 	const allItems = getAllItems();
 
-	allItems.forEach((item) => col.push(`${item.emoji} \`${capitalize(item.name)} ${addWhitespace(item)} Quantity: ${backpack.rows[0][item]}\`\n`));
+	allItems.forEach((item) => col.push(`${item.emoji} \`${capitalize(item.name)} ${addWhitespace(item, backpack.rows[0][item.name])} Quantity: ${backpack.rows[0][item.name]}\`\n`));
 
 	embed.addFields({ name: ' ', value: `${col.join('')}`, inline: true });
 
 	return embed;
 }
 
-function addWhitespace(item) {
+function addWhitespace(item, quantity) {
 	const max = 30;
 
 	// Length of current items
-	const entire = 1 + item.name.length + item.price.toString().length + 'Quantity'.length;
+	const entire = 1 + item.name.length + 'Quantity'.length + quantity.toString().length;
 
 	// Amount of whitespace to add
 	const length = max - entire;
