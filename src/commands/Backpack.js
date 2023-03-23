@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { Client } = require('pg');
 const { con } = require('../util/QueryUtil');
-const { getAllItems } = require('../shop/ItemList');
+const { getAllItems } = require('../items/ItemList');
 const capitalize = require('../util/StringUtil');
 
 let user;

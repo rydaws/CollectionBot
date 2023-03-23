@@ -4,7 +4,7 @@ const { Commands } = require('../CommandList');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const { monsters } = require('../monsters/MonsterDetails');
-const { mousetrap, net, lasso, beartrap, safe } = require('../shop/Traps');
+const { mousetrap, net, lasso, beartrap, safe } = require('../items/Traps');
 
 
 let res;

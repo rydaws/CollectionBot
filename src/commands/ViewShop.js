@@ -3,8 +3,8 @@ const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const capitalize = require('../util/StringUtil');
 const { errorEmbed } = require('../util/EmbedUtil');
-const { refreshItems } = require('../shop/ItemList');
-const { getTrap } = require('../shop/Traps');
+const { refreshItems } = require('../items/ItemList');
+const { getTrap } = require('../items/Traps');
 const { Commands } = require('../CommandList');
 
 
@@ -18,11 +18,11 @@ module.exports = {
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('view')
-				.setDescription('View the shop'))
+				.setDescription('View the items'))
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('buy')
-				.setDescription('Purchase items from the shop')
+				.setDescription('Purchase items from the items')
 				.addStringOption(option =>
 					option.setName('item_name')
 						.setDescription('Name of item to purchase')

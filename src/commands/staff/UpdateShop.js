@@ -1,11 +1,11 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { setActive, getAllTraps } = require('../../shop/Traps');
+const { setActive, getAllTraps } = require('../../items/Traps');
 const { errorEmbed } = require('../../util/EmbedUtil');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('updateshop')
-		.setDescription('Update shop items')
+		.setDescription('Update items items')
 		.addStringOption(option =>
 			option.setName('trap')
 				.setDescription('Trap to change activity of')

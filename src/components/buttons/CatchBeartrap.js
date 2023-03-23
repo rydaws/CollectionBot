@@ -1,5 +1,5 @@
 const { catchAttempt } = require('../../commands/catch');
-const { beartrap } = require('../../shop/Traps');
+const { beartrap } = require('../../items/Traps');
 module.exports = {
 	data: {
 		name: 'catch_beartrap',
