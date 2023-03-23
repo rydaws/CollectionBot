@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { setActive, getAllTraps } = require('../../items/Traps');
+const { getAllTraps, getTrap } = require('../../items/Traps');
 const { errorEmbed } = require('../../util/EmbedUtil');
 
 module.exports = {
@@ -49,7 +49,7 @@ module.exports = {
 			return;
 		}
 
-		setActive(trap, activity);
+		getTrap(trap).enabled = activity;
 
 		await interaction.reply(`Updated ${trap} to ${activity}.`);
 	},
