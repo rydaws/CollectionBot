@@ -1,21 +1,22 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { getAllTraps, getTrap } = require('../../items/Traps');
 const { errorEmbed } = require('../../util/EmbedUtil');
+const { getAllItems, returnItem } = require('../../items/ItemList');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('updateshop')
 		.setDescription('Update items items')
 		.addStringOption(option =>
-			option.setName('trap')
-				.setDescription('Trap to change activity of')
+			option.setName('choice')
+				.setDescription('Item to change activity of')
 				.setRequired(true)
-				.addChoices(
-					{ name: 'Mousetrap', value: 'mousetrap' },
+				.addChoices({ name: 'Mousetrap', value: 'mouseitem' },
 					{ name: 'Net', value: 'net' },
 					{ name: 'Lasso', value: 'lasso' },
-					{ name: 'Beartrap', value: 'beartrap' },
+					{ name: 'Bearitem', value: 'bearitem' },
 					{ name: 'Safe', value: 'safe' },
+					{ name: 'Lucky Shmoin', value: 'luckyshmoin' },
+					{ name: 'Shmoizberry', value: 'shmoizberry' },
 					{ name: 'all', value: 'all' },
 				))
 		.addBooleanOption(option =>
@@ -23,8 +24,9 @@ module.exports = {
 				.setDescription('Status to update to')
 				.setRequired(true)),
 	async execute(interaction) {
-		const trap = interaction.options.getString('trap');
+		const choice = interaction.options.getString('choice');
 		const activity = interaction.options.getBoolean('activity');
+		console.log(choice);
 
 		const member = interaction.member;
 
@@ -40,17 +42,17 @@ module.exports = {
 			return;
 		}
 
-		const trapList = getAllTraps();
+		const itemList = getAllItems();
 
-		if (trap === 'all') {
+		if (choice === 'all') {
 
-			trapList.forEach((traps) => traps.enabled = activity);
+			itemList.forEach((items) => items.enabled = activity);
 			await interaction.reply(`All traps set to ${activity}`);
 			return;
 		}
 
-		getTrap(trap).enabled = activity;
+		returnItem(choice).enabled = activity;
 
-		await interaction.reply(`Updated ${trap} to ${activity}.`);
+		await interaction.reply(`Updated ${choice} to ${activity}.`);
 	},
 };

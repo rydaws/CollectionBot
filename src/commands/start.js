@@ -15,7 +15,7 @@ module.exports = {
 		await client.connect();
 
 		try {
-			// TODO this logic doesnt work, reversed. We want to check if they already exist and stop further queries.
+			// TODO this logic doesn't work, reversed. We want to check if they already exist and stop further queries.
 			// try {
 			// 	await client.query(`SELECT * FROM player WHERE client_id = ${id}`);
 			// }

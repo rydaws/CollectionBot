@@ -43,7 +43,7 @@ function backpackEmbed(backpack) {
 
 	const allItems = getAllItems();
 
-	allItems.forEach((item) => col.push(`${item.emoji} \`${capitalize(item.name)} ${addWhitespace(item, backpack.rows[0][item.name])} Quantity: ${backpack.rows[0][item.name]}\`\n`));
+	allItems.forEach((item) => col.push(`${item.emoji} \`${item.bigName} ${addWhitespace(item, backpack.rows[0][item.name])} Quantity: ${backpack.rows[0][item.name]}\`\n`));
 
 	embed.addFields({ name: ' ', value: `${col.join('')}`, inline: true });
 
@@ -54,7 +54,7 @@ function addWhitespace(item, quantity) {
 	const max = 30;
 
 	// Length of current items
-	const entire = 1 + item.name.length + 'Quantity'.length + quantity.toString().length;
+	const entire = 1 + item.bigName.length + 'Quantity'.length + quantity.toString().length;
 
 	// Amount of whitespace to add
 	const length = max - entire;

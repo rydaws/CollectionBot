@@ -1,10 +1,11 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
-const capitalize = require('../util/StringUtil');
 const { errorEmbed } = require('../util/EmbedUtil');
 const { refreshItems, returnItem } = require('../items/ItemList');
 const { Commands } = require('../CommandList');
+const { refreshTraps } = require('../items/Traps');
+const { refreshAmplifiers } = require('../items/Amplifiers');
 
 
 let user;
@@ -26,15 +27,13 @@ module.exports = {
 					option.setName('item_name')
 						.setDescription('Name of item to purchase')
 						.setRequired(true)
-						.addChoices(
-							{ name: 'Mouseitem', value: 'mouseitem' },
+						.addChoices({ name: 'Mousetrap', value: 'mouseitem' },
 							{ name: 'Net', value: 'net' },
 							{ name: 'Lasso', value: 'lasso' },
 							{ name: 'Bearitem', value: 'bearitem' },
 							{ name: 'Safe', value: 'safe' },
 							{ name: 'Lucky Shmoin', value: 'luckyshmoin' },
-							{ name: 'Shmoizberry', value: 'shmoizberry' },
-						))
+							{ name: 'Shmoizberry', value: 'shmoizberry' }))
 				.addIntegerOption(quantity =>
 					quantity.setName('quantity')
 						.setDescription('Quantity of item')
@@ -101,7 +100,7 @@ module.exports = {
 
 };
 
-function createEmbed(itemList) {
+function createEmbed() {
 
 	const embed = new EmbedBuilder()
 		.setColor(0x0099FF)
@@ -109,17 +108,28 @@ function createEmbed(itemList) {
 		.setDescription('**View my wares...**')
 		.setTimestamp();
 
+	const trapList = refreshTraps();
+	const amplifierList = refreshAmplifiers();
 	const col = [];
 
 	col.push(`**${user.username}'s Shmoins:** ${shmoins}\n\n`);
 
-	// Section will collapse if no items are enabled
-	if (itemList.length > 0) {
+	// Section will collapse if no traps are enabled
+	if (trapList.length > 0) {
 		// Section header
-		col.push('══════════ items ══════════\n');
+		col.push('══════════ Traps ══════════\n');
 
 		// Adds all catching items to embed field
-		itemList.forEach((item) => col.push(`${item.emoji} \`${capitalize(item.name)} ${addWhitespace(item)} ${item.price} Shmoins\`\n`));
+		trapList.forEach((item) => col.push(`${item.emoji} \`${item.bigName} ${addWhitespace(item)} ${item.price} Shmoins\`\n`));
+	}
+
+	// Section will collapse if no amplifiers are enabled
+	if (amplifierList.length > 0) {
+		// Section header
+		col.push('═════════ Amplifiers ═════════\n');
+
+		// Adds all catching items to embed field
+		amplifierList.forEach((item) => col.push(`${item.emoji} \`${item.bigName} ${addWhitespace(item)} ${item.price} Shmoins\`\n`));
 	}
 
 	embed.addFields({ name: ' ', value: `${col.join('')}`, inline: true });
@@ -132,7 +142,7 @@ function successPurchase(item, quantity, price) {
 	return new EmbedBuilder()
 		.setColor(0x32CD32)
 		.setAuthor({ name: 'Purchase success!', iconURL: 'https://collection-monsters.s3.amazonaws.com/success.png' })
-		.setDescription(`You purchased **${quantity} ${item.emoji}${capitalize(item.name)}**(s) for \`${price}\` Shmoins!`);
+		.setDescription(`You purchased **${quantity} ${item.emoji}${item.bigName}**(s) for \`${price}\` Shmoins!`);
 }
 
 function failPurchase(item, quantity, price) {
@@ -140,7 +150,7 @@ function failPurchase(item, quantity, price) {
 	return new EmbedBuilder()
 		.setColor(0xFE514E)
 		.setAuthor({ name: 'Purchase failed!' })
-		.setDescription(`You cannot afford **${quantity} ${item.emoji}${capitalize(item.name)}**(s)! You need \`${price - shmoins}\` more Shmoins!\n\nDo ${Commands.catch} to earn more Shmoins!`);
+		.setDescription(`You cannot afford **${quantity} ${item.emoji}${item.bigName}**(s)! You need \`${price - shmoins}\` more Shmoins!\n\nDo ${Commands.catch} to earn more Shmoins!`);
 
 }
 
@@ -148,7 +158,7 @@ function addWhitespace(item) {
 	const max = 30;
 
 	// Length of current items
-	const entire = 1 + item.name.length + item.price.toString().length + 'Shmoins'.length;
+	const entire = 1 + item.bigName.length + item.price.toString().length + 'Shmoins'.length;
 
 	// Amount of whitespace to add
 	const length = max - entire;
