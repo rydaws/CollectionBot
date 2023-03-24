@@ -5,6 +5,7 @@ const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const { monsters } = require('../monsters/MonsterDetails');
 const { mousetrap, net, lasso, beartrap, safe } = require('../items/Traps');
+const { luckyshmoin, shmoizberry } = require('../items/Amplifiers');
 
 
 let res;
@@ -31,30 +32,46 @@ module.exports = {
 
 		clearTimeout(timeoutId);
 		if (interaction.user.id !== ownerId) {
-			console.log(`[Catch | ERROR] Button client: ${interaction.user.id} does not equal embed client: ${ownerId}`);
+			console.log(`[Catch | ERROR] - Button client: ${interaction.user.id} does not equal embed client: ${ownerId}`);
 			return;
 		}
 
 		const randomRoll = Math.random() * 100;
 
+		// Includes items that increase catch rate
+		let catchAmp = 0;
+		if (backpack.rows[0].shmoizberry !== 0) {
+			catchAmp = shmoizberry.property * backpack.rows[0].shmoizberry;
+		}
+
 		console.log('[Catch] - Roll', randomRoll);
 		console.log('[Catch] - Catch rate', caughtMonster.catchRate);
 		console.log('[Catch] - Device catch rate', device.catchRate);
-		const totalCatchRate = caughtMonster.catchRate + device.catchRate;
+		console.log('[Catch] - Catch amp', catchAmp);
+
+		const totalCatchRate = caughtMonster.catchRate + device.catchRate + catchAmp;
 		console.log('[Catch] - Total catch rate', totalCatchRate);
+
 		const client = new Client(con);
 		await client.connect();
-
 
 		try {
 			if (randomRoll <= totalCatchRate) {
 
 				// Adds Monster to player's box
 				await client.query(`INSERT INTO box VALUES (${ownerId}, ${roll_id}, 1)`);
-				console.log(`[Catch] Added ${roll_id} to ${interaction.user.username}'s box`);
+				console.log(`[Catch] - Added ${roll_id} to ${interaction.user.username}'s box`);
+
+				// Includes items that increase payout from catch event
+				let shmoinAmplifier = 1;
+				if (backpack.rows[0].luckyshmoin !== 0) {
+					shmoinAmplifier = (1 + luckyshmoin.property) * backpack.rows[0].luckyshmoin;
+				}
+
+				console.log('[Catch] - Shmoin Amp', shmoinAmplifier);
 
 				// Reward player with shmoins for catch
-				const shmoinsToAdd = Math.floor(Math.random() * (250 - 125 + 1) + 125) * caughtMonster.shmoinMulti;
+				const shmoinsToAdd = Math.floor(Math.random() * (250 - 125 + 1) + 125 * caughtMonster.shmoinMulti * shmoinAmplifier);
 
 				// Deducts 1 trap from player's backpack and adds shmoins
 				await client.query(`UPDATE backpack SET ${device.name} = (SELECT ${device.name} FROM backpack WHERE client_id = ${ownerId}) - 1, shmoins = (SELECT shmoins FROM backpack WHERE client_id = ${ownerId}) + ${shmoinsToAdd} WHERE client_id = ${ownerId}`);
@@ -69,7 +86,7 @@ module.exports = {
 			}
 		}
 		catch (e) {
-			console.log(`[Catch | ERROR] Failed to catch monster for ${interaction.user.username}.`);
+			console.log(`[Catch | ERROR] - Failed to catch monster for ${interaction.user.username}.`);
 			await interaction.followUp({ embeds: [new EmbedBuilder(errorEmbed('Error! Please contact staff if this issue persists'))] });
 		}
 
@@ -83,10 +100,10 @@ async function catchEvent(interaction) {
 	console.log(`[Catch] - Begin Catch Event for ${ownerId}`);
 
 	// Adds up all the encounter rates for the rarities
-	const totalCatchRate = monsters.reduce((sum, monster) => sum + monster.encounterRate, 0);
+	const totalEncounterRate = monsters.reduce((sum, monster) => sum + monster.encounterRate, 0);
 
 	// Determines random roll based on total encounter rate
-	let randomRoll = Math.floor(Math.random() * totalCatchRate) + 1;
+	let randomRoll = Math.floor(Math.random() * totalEncounterRate) + 1;
 
 	// Iterates through all objects, the lowest chance is hardest to obtain as the roll has to be
 	// lower than or equal to the encounter rate of the index.
@@ -110,7 +127,7 @@ async function catchEvent(interaction) {
 		potentialMonsters = await client.query(`SELECT id from monsters WHERE id not in (SELECT id from box where client_id=${interaction.user.id}) AND rarity = '${caughtMonster.rarity}'`);
 
 		// Populate backpack elements to see what traps are available
-		backpack = await client.query(`SELECT mousetrap, net, lasso, beartrap, safe FROM backpack WHERE client_id = ${ownerId}`);
+		backpack = await client.query(`SELECT * FROM backpack WHERE client_id = ${ownerId}`);
 
 		// If the potentialMonsters returned is 0, user has all the monsters
 		size = Object.keys(potentialMonsters.rows).length;

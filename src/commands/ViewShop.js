@@ -3,8 +3,7 @@ const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const capitalize = require('../util/StringUtil');
 const { errorEmbed } = require('../util/EmbedUtil');
-const { refreshItems } = require('../items/ItemList');
-const { getTrap } = require('../items/Traps');
+const { refreshItems, returnItem } = require('../items/ItemList');
 const { Commands } = require('../CommandList');
 
 
@@ -28,11 +27,13 @@ module.exports = {
 						.setDescription('Name of item to purchase')
 						.setRequired(true)
 						.addChoices(
-							{ name: 'Mousetrap', value: 'mousetrap' },
+							{ name: 'Mouseitem', value: 'mouseitem' },
 							{ name: 'Net', value: 'net' },
 							{ name: 'Lasso', value: 'lasso' },
-							{ name: 'Beartrap', value: 'beartrap' },
+							{ name: 'Bearitem', value: 'bearitem' },
 							{ name: 'Safe', value: 'safe' },
+							{ name: 'Lucky Shmoin', value: 'luckyshmoin' },
+							{ name: 'Shmoizberry', value: 'shmoizberry' },
 						))
 				.addIntegerOption(quantity =>
 					quantity.setName('quantity')
@@ -67,29 +68,30 @@ module.exports = {
 		}
 
 		if (interaction.options.getSubcommand() === 'buy') {
-			const item_id = interaction.options.getString('item_name');
+			const item_name = interaction.options.getString('item_name');
 			const quantity = interaction.options.getInteger('quantity');
-			const trap = getTrap(item_id);
-			const price = trap.price * quantity;
+			const item = returnItem(item_name);
+			console.log(item.name);
+			const price = item.price * quantity;
 
-			if (!trap.enabled) {
+			if (!item.enabled) {
 				await interaction.reply({ embeds: [errorEmbed('Item is not available for purchase at this time')] });
-				console.log(`[Shop | ERROR] - Item ${trap.name} is not enabled for purchase!`);
+				console.log(`[Shop | ERROR] - Item ${item.name} is not enabled for purchase!`);
 				return;
 			}
 
 			if (price > shmoins) {
-				await interaction.reply({ embeds: [failPurchase(trap, quantity, price)] });
-				console.log(`[Shop | ERROR] - Client ${user.username} needs ${price - quantity} to afford ${quantity} ${trap.name}'s`);
+				await interaction.reply({ embeds: [failPurchase(item, quantity, price)] });
+				console.log(`[Shop | ERROR] - Client ${user.username} needs ${price - quantity} to afford ${quantity} ${item.name}'s`);
 				return;
 			}
 
-			// Adds trap(s) to player's backpack and deducts shmoins
-			await client.query(`UPDATE backpack SET ${trap.name} = (SELECT ${trap.name} FROM backpack WHERE client_id = ${user.id}) + ${quantity}, shmoins = (SELECT shmoins FROM backpack WHERE client_id = ${user.id}) - ${price} WHERE client_id = ${user.id}`);
-			console.log(`[Shop] - Added 1 ${trap.name} from client ${user.username}`);
+			// Adds item(s) to player's backpack and deducts shmoins
+			await client.query(`UPDATE backpack SET ${item.name} = (SELECT ${item.name} FROM backpack WHERE client_id = ${user.id}) + ${quantity}, shmoins = (SELECT shmoins FROM backpack WHERE client_id = ${user.id}) - ${price} WHERE client_id = ${user.id}`);
+			console.log(`[Shop] - Added 1 ${item.name} from client ${user.username}`);
 			console.log(`[Shop] - Deducted ${price} to client ${user.username}`);
 
-			await interaction.reply({ embeds: [successPurchase(trap, quantity, price)] });
+			await interaction.reply({ embeds: [successPurchase(item, quantity, price)] });
 
 		}
 
@@ -114,7 +116,7 @@ function createEmbed(itemList) {
 	// Section will collapse if no items are enabled
 	if (itemList.length > 0) {
 		// Section header
-		col.push('══════════ Traps ══════════\n');
+		col.push('══════════ items ══════════\n');
 
 		// Adds all catching items to embed field
 		itemList.forEach((item) => col.push(`${item.emoji} \`${capitalize(item.name)} ${addWhitespace(item)} ${item.price} Shmoins\`\n`));
@@ -125,20 +127,20 @@ function createEmbed(itemList) {
 	return embed;
 }
 
-function successPurchase(trap, quantity, price) {
+function successPurchase(item, quantity, price) {
 
 	return new EmbedBuilder()
 		.setColor(0x32CD32)
 		.setAuthor({ name: 'Purchase success!', iconURL: 'https://collection-monsters.s3.amazonaws.com/success.png' })
-		.setDescription(`You purchased **${quantity} ${trap.emoji}${capitalize(trap.name)}**(s) for \`${price}\` Shmoins!`);
+		.setDescription(`You purchased **${quantity} ${item.emoji}${capitalize(item.name)}**(s) for \`${price}\` Shmoins!`);
 }
 
-function failPurchase(trap, quantity, price) {
+function failPurchase(item, quantity, price) {
 
 	return new EmbedBuilder()
 		.setColor(0xFE514E)
 		.setAuthor({ name: 'Purchase failed!' })
-		.setDescription(`You cannot afford **${quantity} ${trap.emoji}${capitalize(trap.name)}**(s)! You need \`${price - shmoins}\` more Shmoins!\n\nDo ${Commands.catch} to earn more Shmoins!`);
+		.setDescription(`You cannot afford **${quantity} ${item.emoji}${capitalize(item.name)}**(s)! You need \`${price - shmoins}\` more Shmoins!\n\nDo ${Commands.catch} to earn more Shmoins!`);
 
 }
 
