@@ -3,9 +3,13 @@ const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const { errorEmbed, textEmbed } = require('../util/EmbedUtil');
 
+// Global variables
 let res;
 let level;
 
+// TODO move to staff commands
+
+// Incoming SlashCommand
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('uplevel')
@@ -18,11 +22,17 @@ module.exports = {
 		const client_id = interaction.user.id;
 		const monster_id = interaction.options.getInteger('id');
 
+		// SQL connection
 		const client = new Client(con);
 		await client.connect();
 
 		try {
+
+			// TODO this might be able to be condensed into one line. Select and update at same time, reduce by 1 if needed
+			// Gets current level of monster from user's box
 			res = await client.query(`SELECT level FROM box WHERE client_id=${client_id} AND id=${monster_id}`);
+
+			// Increases user's monster by 1
 			level = res.rows[0].level + 1;
 			await client.query(`UPDATE box SET level = ${level} WHERE client_id = ${client_id} AND id = ${monster_id}`);
 
@@ -36,6 +46,7 @@ module.exports = {
 
 		}
 
+		// Closes SQL connection
 		client.end();
 
 	},

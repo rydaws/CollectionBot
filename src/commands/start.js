@@ -3,6 +3,7 @@ const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const { errorEmbed, textEmbed } = require('../util/EmbedUtil');
 
+// Incoming SlashCommand
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('start')
@@ -10,7 +11,7 @@ module.exports = {
 	async execute(interaction) {
 		const id = interaction.user.id;
 
-
+		// SQL connection
 		const client = new Client(con);
 		await client.connect();
 
@@ -23,6 +24,8 @@ module.exports = {
 			// 	console.log(`[Start | ERROR] Profile already exists for ${id}`);
 			// }
 			console.log(`[Start] Adding if not exists ${id}`);
+
+			// Create record for player and insert starting items into their backpack
 			await client.query(`INSERT INTO player VALUES (${id}, DEFAULT) ON CONFLICT (client_id) DO NOTHING`);
 			await client.query(`INSERT INTO backpack VALUES (${id}, 100, DEFAULT, DEFAULT, DEFAULT, DEFAULT) ON CONFLICT (client_id) DO NOTHING`);
 
@@ -38,7 +41,7 @@ module.exports = {
 
 		}
 
-
+		// Closes SQL connection
 		client.end();
 
 	},

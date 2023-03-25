@@ -7,7 +7,7 @@ const { monsters } = require('../monsters/MonsterDetails');
 const { mousetrap, net, lasso, beartrap, safe } = require('../items/Traps');
 const { luckyshmoin, shmoizberry } = require('../items/Amplifiers');
 
-
+// Global variables
 let res;
 let roll_id;
 let potentialMonsters;
@@ -17,25 +17,38 @@ let ownerId;
 let timeoutId;
 let caughtMonster;
 
+// Incoming SlashCommand
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('catch')
 		.setDescription('Encounter a monster and attempt to capture it!'),
 	async execute(interaction) {
+		// ID of user who "owns" this embed
 		ownerId = interaction.user.id;
 
 		// Begin catch event
 		await catchEvent(interaction);
 
 	},
+	/**
+	 * Attempt is triggered once button below embed is pressed.
+	 *
+	 * @param interaction - The interaction from the event.
+	 * @param device - Trap that was used
+	 * @returns {Promise<void>} - Waits for catch to finish before continuing.
+	 */
 	async catchAttempt(interaction, device) {
 
+		// Clears runaway trigger
 		clearTimeout(timeoutId);
+
+		// Only allows "owner" of embed to interact with it.
 		if (interaction.user.id !== ownerId) {
 			console.log(`[Catch | ERROR] - Button client: ${interaction.user.id} does not equal embed client: ${ownerId}`);
 			return;
 		}
 
+		// Random number 0 - 100
 		const randomRoll = Math.random() * 100;
 
 		// Includes items that increase catch rate
@@ -49,13 +62,16 @@ module.exports = {
 		console.log('[Catch] - Device catch rate', device.catchRate);
 		console.log('[Catch] - Catch amp', catchAmp);
 
+		// Total catch rate with all modifiers
 		const totalCatchRate = caughtMonster.catchRate + device.catchRate + catchAmp;
 		console.log('[Catch] - Total catch rate', totalCatchRate);
 
+		// SQL connection
 		const client = new Client(con);
 		await client.connect();
 
 		try {
+			// If random roll is <= your total catch rate, catch is successful
 			if (randomRoll <= totalCatchRate) {
 
 				// Adds Monster to player's box
@@ -90,12 +106,19 @@ module.exports = {
 			await interaction.followUp({ embeds: [new EmbedBuilder(errorEmbed('Error! Please contact staff if this issue persists'))] });
 		}
 
+		// Close SQL connection
 		client.end();
 
 	},
 
 };
 
+/**
+ * Chooses unowned Monster and display's event to user.
+ *
+ * @param interaction - The embed interaction
+ * @returns {Promise<void>} - Waits for chosen monster before proceeding.
+ */
 async function catchEvent(interaction) {
 	console.log(`[Catch] - Begin Catch Event for ${ownerId}`);
 
@@ -117,7 +140,7 @@ async function catchEvent(interaction) {
 
 	console.log(`[Catch] - Rarity ${caughtMonster.rarity} chosen.`);
 
-	// Establish DB connection
+	// SQL connection
 	const client = new Client(con);
 	await client.connect();
 
@@ -145,10 +168,11 @@ async function catchEvent(interaction) {
 		// ID of monster to display for catch event
 		roll_id = potentialMonsters.rows[Math.floor(Math.random() * (size))].id;
 
+		// Get monster data from DB
 		res = await client.query(`SELECT * FROM monsters WHERE id=${roll_id}`);
 
+		// Runaway embed update if user does not interact within certain 5 seconds
 		timeoutId = setTimeout(async () => {
-			// await interaction.editReply({ content: `You captured ${res.rows[0].display_name}!`, embeds: [new EmbedBuilder(monsterEmbed(interaction.user, res))] });
 			await interaction.editReply({ content: 'The monster ran away!', embeds: [new EmbedBuilder(runaway(interaction.user, res))], components: [] });
 		}, 5000);
 
@@ -159,11 +183,20 @@ async function catchEvent(interaction) {
 	}
 	catch (e) {
 		console.log(`[Catch | ERROR] - No monsters found with ${caughtMonster.rarity}`);
+		// Clears runaway trigger
 		clearTimeout(timeoutId);
 	}
 
+	// Close SQL connection
+	client.end();
+
 }
 
+/**
+ * Creates trap buttons below embed for user to interact with.
+ *
+ * @returns {ActionRowBuilder<AnyComponentBuilder>} - Button row below embed.
+ */
 function createButtons() {
 
 	// Do inventory check before displaying available catch devices.
@@ -173,6 +206,8 @@ function createButtons() {
 	const lassoAmt = backpack.rows[0].lasso;
 	const beartrapAmt = backpack.rows[0].beartrap;
 	const safeAmt = backpack.rows[0].safe;
+
+	// If user has 0 of a certain trap, do not display button.
 
 	if (mousetrapAmt > 0) {
 		buttons.addComponents(

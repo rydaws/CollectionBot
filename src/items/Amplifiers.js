@@ -1,21 +1,21 @@
+// Amplifiers
 const luckyshmoin = { id: 6, name: 'luckyshmoin', bigName: 'Lucky Shmoin', property: 0.10, emoji: '🪙', price: 5000, enabled: true };
 const shmoizberry = { id: 7, name: 'shmoizberry', bigName: 'Shmoizberry', property: 5, emoji: '🍓', price: 5000, enabled: true };
 
-function getAmplifier(item_name) {
-	item_name = item_name.toString().toLowerCase();
-
-	switch (item_name) {
-	case 'luckyshmoin':
-		return luckyshmoin;
-	case 'shmoizberry':
-		return shmoizberry;
-	}
-}
-
+/**
+ * Return list of all amplifiers
+ *
+ * @returns {[]} Array of items.
+ */
 function getAllAmplifiers() {
 	return [luckyshmoin, shmoizberry];
 }
 
+/**
+ * Refreshes active amplifiers.
+ *
+ * @returns {[]} Array of active items.
+ */
 function refreshAmplifiers() {
 	const itemList = [];
 	getAllAmplifiers().forEach((item) => {
@@ -26,9 +26,8 @@ function refreshAmplifiers() {
 	return itemList;
 }
 
+// Exported elements
 module.exports = {
-	getAmplifier,
-	getAllAmplifiers,
 	refreshAmplifiers,
 	luckyshmoin,
 	shmoizberry,

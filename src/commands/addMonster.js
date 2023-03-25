@@ -3,8 +3,10 @@ const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const { errorEmbed, textEmbed } = require('../util/EmbedUtil');
 
+// Global variables
 let res;
 
+// Incoming SlashCommand
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('addmonster')
@@ -13,15 +15,20 @@ module.exports = {
 			option.setName('id')
 				.setDescription('The id of the monster')
 				.setRequired(true)),
+
 	async execute(interaction) {
 		const client_id = interaction.user.id;
 		const monster_id = interaction.options.getInteger('id');
 
+		// SQL connection
 		const client = new Client(con);
 		await client.connect();
 
 		try {
+			// Adds specified monster into client's box
 			await client.query(`INSERT INTO box VALUES (${client_id}, ${monster_id}, 1)`);
+
+			// Gathers monster data
 			res = await client.query(`SELECT * FROM monsters WHERE id = ${monster_id}`);
 
 			const monster_name = res.rows[0].display_name;
@@ -35,6 +42,7 @@ module.exports = {
 			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('That monster does not exist or you already own it!'))] });
 		}
 
+		// Closes SQL connection
 		client.end();
 
 	},

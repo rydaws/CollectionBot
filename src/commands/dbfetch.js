@@ -6,6 +6,8 @@ const { errorEmbed } = require('../util/EmbedUtil');
 const { fetchMonsterDetails } = require('../monsters/MonsterDetails');
 dotenv.config();
 
+
+// Global variables
 let res;
 let user;
 let name;
@@ -14,6 +16,7 @@ let type;
 let rarity;
 let img;
 
+// Incoming SlashCommand
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('fetch')
@@ -24,14 +27,16 @@ module.exports = {
 				.setRequired(true)),
 
 	async execute(interaction) {
+		// ID for monster
 		const id = interaction.options.getInteger('id');
 		user = interaction.user;
 
-		// Establish connection
+		// SQL connection
 		const client  = new Client(con);
 		await client.connect();
 
 		try {
+			// Gets monster data
 			res = await client.query(`SELECT * FROM monsters WHERE id=${id}`);
 			name = res.rows[0].display_name;
 			className = res.rows[0].class;
@@ -41,19 +46,23 @@ module.exports = {
 
 			console.log(`[Fetch] Retrieving monster with ID ${id} and name ${name}.`);
 
-			const em = createEmbed();
-			await interaction.reply({ embeds: [em] });
+			await interaction.reply({ embeds: [createEmbed()] });
 		}
 		catch (e) {
 			console.log(`[Fetch | ERROR] Failed to fetch monster with id ${id}.`);
 			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Could not fetch monster with that ID!'))] });
 		}
 
-		// Close connection
+		// Close SQL connection
 		await client.end();
 	},
 };
 
+/**
+ * Creates monster embed.
+ *
+ * @returns {EmbedBuilder} - The embed to be displayed
+ */
 function createEmbed() {
 	return new EmbedBuilder()
 		.setColor(fetchMonsterDetails(rarity).color)

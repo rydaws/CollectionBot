@@ -19,7 +19,6 @@ function refreshTraps() {
 }
 
 module.exports = {
-	getAllTraps,
 	refreshTraps,
 	mousetrap,
 	net,
