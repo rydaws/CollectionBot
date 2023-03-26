@@ -3,5 +3,6 @@ module.exports.Commands = {
 	catch: '`/catch`',
 	show: '`/show [id]`',
 	quest: '`/quest start`',
-	shop: ['`/items view`', '`/items buy`'],
+	shop: ['`/shop view`', '`/shop buy`'],
+	backpack: '`/backpack`',
 };

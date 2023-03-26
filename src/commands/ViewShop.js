@@ -7,10 +7,11 @@ const { Commands } = require('../CommandList');
 const { refreshTraps } = require('../items/Traps');
 const { refreshAmplifiers } = require('../items/Amplifiers');
 
-
+// Global variables
 let user;
 let shmoins;
 
+// Incoming SlashCommand
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('shop')
@@ -45,10 +46,12 @@ module.exports = {
 		// Refreshes item list
 		const itemList = refreshItems();
 
+		// SQL connection
 		const client = new Client(con);
 		await client.connect();
 
 		try {
+			// Gets user's Shmoins
 			const res = await client.query(`SELECT shmoins FROM backpack WHERE client_id = ${user.id}`);
 			shmoins = res.rows[0].shmoins;
 		}
@@ -56,8 +59,10 @@ module.exports = {
 			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Shop Error! Please contact staff!'))] });
 		}
 
+		// Subcommand for viewing shop
 		if (interaction.options.getSubcommand() === 'view') {
 			try {
+				// Embed to list all shop items
 				await interaction.reply({ embeds: [createEmbed(itemList)] });
 			}
 			catch (error) {
@@ -66,19 +71,25 @@ module.exports = {
 
 		}
 
+		// Subcommand for buying items from the shop
 		if (interaction.options.getSubcommand() === 'buy') {
+			// Gets parameters from command
 			const item_name = interaction.options.getString('item_name');
 			const quantity = interaction.options.getInteger('quantity');
+
+			// Gets item object from the name specified
 			const item = returnItem(item_name);
-			console.log(item.name);
+
 			const price = item.price * quantity;
 
+			// Checks if item is enabled, otherwise deny purchase
 			if (!item.enabled) {
 				await interaction.reply({ embeds: [errorEmbed('Item is not available for purchase at this time')] });
 				console.log(`[Shop | ERROR] - Item ${item.name} is not enabled for purchase!`);
 				return;
 			}
 
+			// Checks if user can afford item, if not, deny purchase
 			if (price > shmoins) {
 				await interaction.reply({ embeds: [failPurchase(item, quantity, price)] });
 				console.log(`[Shop | ERROR] - Client ${user.username} needs ${price - quantity} to afford ${quantity} ${item.name}'s`);
@@ -94,12 +105,18 @@ module.exports = {
 
 		}
 
+		// Close SQL connection
 		client.end();
 
 	},
 
 };
 
+/**
+ * Creates shop embed with item prices.
+ *
+ * @returns {EmbedBuilder} - The shop embed
+ */
 function createEmbed() {
 
 	const embed = new EmbedBuilder()
@@ -108,6 +125,8 @@ function createEmbed() {
 		.setDescription('**View my wares...**')
 		.setTimestamp();
 
+	// TODO maybe we can filter instead of having this function?
+	// Refreshes items to filter out disabled ones
 	const trapList = refreshTraps();
 	const amplifierList = refreshAmplifiers();
 	const col = [];
@@ -137,6 +156,15 @@ function createEmbed() {
 	return embed;
 }
 
+/**
+ * Constructs embed of a successful purchase.
+ *
+ * @param {Object} item - The item purchased
+ * @param {int} quantity - Quantity of item
+ * @param {int} price - Price of item that was purchased
+ *
+ * @returns {EmbedBuilder} - The embed that is returned
+ */
 function successPurchase(item, quantity, price) {
 
 	return new EmbedBuilder()
@@ -145,6 +173,15 @@ function successPurchase(item, quantity, price) {
 		.setDescription(`You purchased **${quantity} ${item.emoji}${item.bigName}**(s) for \`${price}\` Shmoins!`);
 }
 
+/**
+ * Constructs embed of a failed purchase.
+ *
+ * @param {Object} item - The item purchased
+ * @param {int} quantity - Quantity of item
+ * @param {int} price - Price of item that was purchased
+ *
+ * @returns {EmbedBuilder} - The embed that is returned
+ */
 function failPurchase(item, quantity, price) {
 
 	return new EmbedBuilder()
@@ -154,6 +191,14 @@ function failPurchase(item, quantity, price) {
 
 }
 
+/**
+ * Adds whitespace to lines.
+ *
+ * Adaptively adds whitespace to make all lines exactly the same length for display.
+ *
+ * @param {Object} item - The current item
+ * @returns {string} - String of whitespace
+ */
 function addWhitespace(item) {
 	const max = 30;
 
