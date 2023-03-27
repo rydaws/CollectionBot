@@ -1,10 +1,11 @@
 
 # Collection Corp
 
-Collection Corp is a Discord bot using Discord.js v14.
+Collection Corp is a Discord bot using [Discord.js](https://github.com/discordjs/discord.js) v14.
 
 Users can capture monsters, build their collection, and send them out on quests to gain experience!
 
+Join here! https://discord.gg/fdez3qNSYj
 
 
 
@@ -79,3 +80,10 @@ Use the slash (/) command `/catch` to start the catch event. Use an owned trap b
 
 - Shmoins are the currency you use to purchase items from the shop.
 - To earn Shmoins, catch Monsters. The better the rarity of Monster, the better the Shmoin payout is.
+
+## Roadmap
+
+- Quests - The bread and butter of Collection Corp. Users will be able to send their Monsters out on timed quests to level them up. Upon completion, Monsters will gain experience points and items that they bring back to their trainer
+
+- Optimizations
+
