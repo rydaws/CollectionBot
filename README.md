@@ -18,6 +18,11 @@ Join here! https://discord.gg/fdez3qNSYj
 - [@rydaws](https://www.github.com/rydaws)
 
 
+## Tech Stack
+
+**Server:** Node, PM2, Jenkins, AWS RDS, AWS S3, AWS EC2
+
+
 ## Included slash `(/)` commands
 
 ### - `/start` - Creates profile for user so they can start to obtain and use Monsters
