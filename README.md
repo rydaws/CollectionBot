@@ -61,7 +61,7 @@ List all of your available items, from traps to amplifiers.
 ![App Screenshot](https://i.gyazo.com/183ce18d7c3415b418169f7067fec530.png)
 ### - `/shop [view | buy] <item> <quantity>` - View or purchase items
 
-View available items in the shop and purchase some with our currency ["Shmoins"](#What-are-"Shmoins"?).
+View available items in the shop and purchase some with our currency ["Shmoins"](#faq).
 
 ![App Screenshot](https://i.gyazo.com/8efde1e9ff9305c01f6990f455ce52de.png)
 
