@@ -122,7 +122,7 @@ function catchEmbed(user, res) {
 
 	return new EmbedBuilder()
 		.setColor(fetchMonsterDetails(rarity).color)
-		.setAuthor({ name: 'A Monster appeared!', iconURL: 'https://collection-monsters.s3.amazonaws.com/tallgrass.png' })
+		.setAuthor({ name: 'RYAN TEST A Monster appeared!', iconURL: 'https://collection-monsters.s3.amazonaws.com/tallgrass.png' })
 		.setDescription(`**${user.username}** found a wild **${name}!**`)
 		.setThumbnail(img)
 		.addFields(
