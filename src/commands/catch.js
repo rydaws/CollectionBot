@@ -176,7 +176,7 @@ async function catchEvent(interaction) {
 			await interaction.editReply({ content: 'The monster ran away!', embeds: [new EmbedBuilder(runaway(interaction.user, res))], components: [] });
 		}, 5000);
 
-		const msg = 'Test 2 Click any of the options at the bottom to attempt capture!';
+		const msg = 'Test 3 Click any of the options at the bottom to attempt capture!';
 
 		await interaction.reply({ content: msg, embeds: [new EmbedBuilder(catchEmbed(interaction.user, res))], components: [createButtons()] });
 
