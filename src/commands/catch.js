@@ -126,26 +126,32 @@ async function catchEvent(interaction) {
 	const client = new Client(con);
 	await client.connect();
 
+	// Get potential monsters to prevent duplicate rarity rolls, This ensures players always get something new
 	try {
-		newPMonsters = await client.query(`SELECT DISTINCT rarity
-FROM monsters
-WHERE
-monsters.id not in (SELECT box.id FROM box where client_id = ${ownerId})
-ORDER BY rarity
-`);
+		newPMonsters = await client.query(`
+			SELECT DISTINCT rarity
+			FROM monsters
+			WHERE
+			monsters.id not in (SELECT box.id 
+								FROM box 
+								WHERE client_id = ${ownerId})
+								ORDER BY rarity
+			`);
 	}
 	catch (e) {
-		console.log('monster not found error');
+		console.log('[Catch | ERROR] - Rarity cannot be found!');
 	}
 
 	const pRarity = [];
 
+	// Create list of potential rarities available
 	for (let i = 0; i < Object.keys(newPMonsters.rows).length; i++) {
 		pRarity.push(newPMonsters.rows[i].rarity);
 	}
 
 	console.log('[Catch] - Potential rarities... ', pRarity);
 
+	// Filter out rarities that are not in the potential list
 	monsters = monsters.filter((mon) => pRarity.includes(mon.rarity));
 
 	// Adds up all the encounter rates for the rarities
@@ -178,13 +184,10 @@ ORDER BY rarity
 		// If the potentialMonsters returned is 0, user has all the monsters
 		size = Object.keys(potentialMonsters.rows).length;
 
-		// TODO instead, have it reroll until a monster is found?
-		// Notes: infinite roll if we just recall function, will have to revist
-
 		// Cancel catch interaction
 		if (size === 0) {
 			console.log(`[Catch | ERROR] Client ${ownerId} owns all monsters.`);
-			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You already own all monsters of the ${caughtMonster.rarity} rarity! Focus on training them with ${Commands.quest}`))] });
+			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You already own all monsters! Focus on training them with ${Commands.quest}`))] });
 			return;
 		}
 
