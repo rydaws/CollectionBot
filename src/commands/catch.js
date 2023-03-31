@@ -223,7 +223,7 @@ async function catchEvent(interaction) {
 /**
  * Creates trap buttons below embed for user to interact with.
  *
- * @returns {ActionRowBuilder<AnyComponentBuilder>} - Button row below embed.
+ * @returns {ActionRowBuilder<>} - Button row below embed.
  */
 function createButtons() {
 
