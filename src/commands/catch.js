@@ -127,7 +127,7 @@ async function catchEvent(interaction) {
 	await client.connect();
 
 	try {
-		newPMonsters = await client.query(`SELECT monsters.rarity, monsters.display_name, monsters.id
+		newPMonsters = await client.query(`SELECT rarity
 FROM monsters
 WHERE
 monsters.id not in (SELECT box.id FROM box where client_id = ${ownerId})
@@ -139,6 +139,8 @@ ORDER BY rarity
 	}
 
 	const pRarity = [];
+
+	console.log('Rarity ', newPMonsters.rows[0].rarity);
 
 	Object.keys(newPMonsters.rows).forEach((mon) => {
 		pRarity.push(mon.rarity);
