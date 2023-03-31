@@ -140,18 +140,13 @@ ORDER BY rarity
 
 	const pRarity = [];
 
-	console.log('Rarity ', newPMonsters.rows[0].rarity);
-
 	for (let i = 0; i < Object.keys(newPMonsters.rows).length; i++) {
 		pRarity.push(newPMonsters.rows[i].rarity);
 	}
 
-	console.log('All ', pRarity);
-	console.log('All mon ', monsters);
+	console.log('[Catch] - Potential rarities... ', pRarity);
 
 	monsters = monsters.filter((mon) => pRarity.includes(mon.rarity));
-
-	monsters.forEach((mon) => console.log(mon.rarity));
 
 	// Adds up all the encounter rates for the rarities
 	const totalEncounterRate = monsters.reduce((sum, monster) => sum + monster.encounterRate, 0);
