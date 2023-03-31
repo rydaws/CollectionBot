@@ -146,7 +146,8 @@ ORDER BY rarity
 		pRarity.push(newPMonsters.rows[i]);
 	}
 
-	console.log('All ', pRarity);
+	console.log('All ', pRarity.rarity);
+	console.log('All mon ', monsters.rarity);
 
 	monsters = monsters.filter((mon) => pRarity.includes(mon.rarity));
 
