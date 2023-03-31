@@ -148,7 +148,7 @@ ORDER BY rarity
 
 	console.log('All ', pRarity);
 
-	monsters.filter((mon) => pRarity.includes(mon.rarity));
+	monsters.filter((mon) => !pRarity.includes(mon.rarity));
 
 	monsters.forEach((mon) => console.log(mon.rarity));
 
