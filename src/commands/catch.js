@@ -142,9 +142,9 @@ ORDER BY rarity
 
 	console.log('Rarity ', newPMonsters.rows[0].rarity);
 
-	Object.keys(newPMonsters.rows.rarity).forEach((mon) => {
-		pRarity.push(mon);
-	});
+	for (let i = 0; i < Object.keys(newPMonsters.rows).length; i++) {
+		pRarity.push(newPMonsters.rows[i]);
+	}
 
 	console.log('All ', pRarity);
 
