@@ -127,7 +127,7 @@ async function catchEvent(interaction) {
 	await client.connect();
 
 	try {
-		newPMonsters = await client.query(`SELECT rarity
+		newPMonsters = await client.query(`SELECT DISTINCT rarity
 FROM monsters
 WHERE
 monsters.id not in (SELECT box.id FROM box where client_id = ${ownerId})
