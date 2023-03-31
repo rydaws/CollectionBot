@@ -3,7 +3,7 @@ const { catchEmbed, errorEmbed, runaway, badCatch, successCatch } = require('../
 const { Commands } = require('../CommandList');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
-const { monsters } = require('../monsters/MonsterDetails');
+let { monsters } = require('../monsters/MonsterDetails');
 const { mousetrap, net, lasso, beartrap, safe } = require('../items/Traps');
 const { luckyshmoin, shmoizberry } = require('../items/Amplifiers');
 
@@ -148,7 +148,7 @@ ORDER BY rarity
 
 	console.log('All ', pRarity);
 
-	monsters.filter((mon) => !pRarity.includes(mon.rarity));
+	monsters = monsters.filter((mon) => pRarity.includes(mon.rarity));
 
 	monsters.forEach((mon) => console.log(mon.rarity));
 
