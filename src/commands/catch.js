@@ -121,6 +121,34 @@ module.exports = {
  */
 async function catchEvent(interaction) {
 	console.log(`[Catch] - Begin Catch Event for ${ownerId}`);
+	let newPMonsters;
+	// SQL connection
+	const client = new Client(con);
+	await client.connect();
+
+	try {
+		newPMonsters = await client.query(`SELECT monsters.rarity, monsters.display_name, monsters.id
+FROM monsters
+WHERE
+monsters.id not in (SELECT box.id FROM box where client_id = ${ownerId})
+ORDER BY rarity
+`);
+	}
+	catch (e) {
+		console.log('monster not found error');
+	}
+
+	const pRarity = [];
+
+	Object.keys(newPMonsters.rows).forEach((mon) => {
+		pRarity.add(mon.rarity);
+	});
+
+	console.log('All', pRarity);
+
+	monsters.filter((mon) => pRarity.includes(mon.rarity));
+
+	monsters.forEach((mon) => console.log(mon.rarity));
 
 	// Adds up all the encounter rates for the rarities
 	const totalEncounterRate = monsters.reduce((sum, monster) => sum + monster.encounterRate, 0);
@@ -130,6 +158,7 @@ async function catchEvent(interaction) {
 
 	// Iterates through all objects, the lowest chance is hardest to obtain as the roll has to be
 	// lower than or equal to the encounter rate of the index.
+	// Determines rarity to pick
 	for (let i = 0; i < monsters.length; i++) {
 		if (randomRoll <= monsters[i].encounterRate) {
 			caughtMonster = monsters[i];
@@ -139,10 +168,6 @@ async function catchEvent(interaction) {
 	}
 
 	console.log(`[Catch] - Rarity ${caughtMonster.rarity} chosen.`);
-
-	// SQL connection
-	const client = new Client(con);
-	await client.connect();
 
 	try {
 
