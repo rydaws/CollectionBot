@@ -197,6 +197,8 @@ async function catchEvent(interaction) {
 		// Get monster data from DB
 		res = await client.query(`SELECT * FROM monsters WHERE id=${roll_id}`);
 
+		console.log(`[Catch] - Monster ${res.rows[0].display_name} appeared for user ${ownerId}`);
+
 		// Runaway embed update if user does not interact within certain 5 seconds
 		timeoutId = setTimeout(async () => {
 			await interaction.editReply({ content: 'The monster ran away!', embeds: [new EmbedBuilder(runaway(interaction.user, res))], components: [] });
