@@ -143,11 +143,11 @@ ORDER BY rarity
 	console.log('Rarity ', newPMonsters.rows[0].rarity);
 
 	for (let i = 0; i < Object.keys(newPMonsters.rows).length; i++) {
-		pRarity.push(newPMonsters.rows[i]);
+		pRarity.push(newPMonsters.rows[i].rarity);
 	}
 
-	console.log('All ', pRarity.rarity);
-	console.log('All mon ', monsters.rarity);
+	console.log('All ', pRarity);
+	console.log('All mon ', monsters);
 
 	monsters = monsters.filter((mon) => pRarity.includes(mon.rarity));
 
