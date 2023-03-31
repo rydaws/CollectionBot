@@ -141,7 +141,7 @@ ORDER BY rarity
 	const pRarity = [];
 
 	Object.keys(newPMonsters.rows).forEach((mon) => {
-		pRarity.add(mon.rarity);
+		pRarity.push(mon.rarity);
 	});
 
 	console.log('All', pRarity);
