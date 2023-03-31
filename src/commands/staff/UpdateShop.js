@@ -11,7 +11,7 @@ module.exports = {
 			option.setName('choice')
 				.setDescription('Item to change activity of')
 				.setRequired(true)
-				.addChoices({ name: 'Mousetrap', value: 'mouseitem' },
+				.addChoices({ name: 'Mousetrap', value: 'mousetrap' },
 					{ name: 'Net', value: 'net' },
 					{ name: 'Lasso', value: 'lasso' },
 					{ name: 'Bearitem', value: 'bearitem' },

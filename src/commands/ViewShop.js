@@ -28,7 +28,7 @@ module.exports = {
 					option.setName('item_name')
 						.setDescription('Name of item to purchase')
 						.setRequired(true)
-						.addChoices({ name: 'Mousetrap', value: 'mouseitem' },
+						.addChoices({ name: 'Mousetrap', value: 'mousetrap' },
 							{ name: 'Net', value: 'net' },
 							{ name: 'Lasso', value: 'lasso' },
 							{ name: 'Bearitem', value: 'bearitem' },
