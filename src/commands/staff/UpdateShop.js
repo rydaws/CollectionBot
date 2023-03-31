@@ -9,7 +9,7 @@ module.exports = {
 		.setDescription('Update items items')
 		.addStringOption(option =>
 			option.setName('choice')
-				.setDescription('TEST Item to change activity of')
+				.setDescription('Item to change activity of')
 				.setRequired(true)
 				.addChoices({ name: 'Mousetrap', value: 'mousetrap' },
 					{ name: 'Net', value: 'net' },
