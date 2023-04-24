@@ -82,18 +82,16 @@ module.exports = {
 			catch (error) {
 				console.log('error');
 			}
-			await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`TEAM UPDATED: Slot 1: ${team[0]} Slot 2: ${team[1]} Slot 3: ${team[2]} Slot 4: ${team[3]}`))] });
-		}
-		else {
-			await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Slot 1: ${dbteam.rows[0].slot_1} Slot 2: ${dbteam.rows[0].slot_2} Slot 3: ${dbteam.rows[0].slot_3} Slot 4: ${dbteam.rows[0].slot_4}`))] });
 		}
 
 		client.end();
 	},
 };
 
-async function viewTeam() {
+async function viewTeam(interaction) {
 	console.log('Viewing team...');
+	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Slot 1: ${dbteam.rows[0].slot_1} Slot 2: ${dbteam.rows[0].slot_2} Slot 3: ${dbteam.rows[0].slot_3} Slot 4: ${dbteam.rows[0].slot_4}`))] });
+
 }
 
 async function addMember(interaction) {
@@ -105,7 +103,7 @@ async function addMember(interaction) {
 		console.log(`[Team | ERROR] User ${user.username}'s team is full! Cannot add another member.`);
 		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Team is full! Cannot add another member'))] });
 
-		return;
+		return true;
 	}
 
 	let hit;
@@ -115,12 +113,15 @@ async function addMember(interaction) {
 		console.log(`[Team | ERROR] User ${user.username} does not own monster ${monster_id}`);
 		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You do not own that monster! View your monsters with ${Commands.box}`))] });
 
-		return;
+		return true;
 	}
 
 	const index = team.findIndex((member) => member === null);
 
 	team[index] = monster_id;
+
+	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`TEAM UPDATED: Slot 1: ${team[0]} Slot 2: ${team[1]} Slot 3: ${team[2]} Slot 4: ${team[3]}`))] });
+
 
 }
 
