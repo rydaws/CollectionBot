@@ -5,6 +5,7 @@ const { Client } = require('pg');
 
 let user;
 let res;
+let team = [];
 
 // Incoming SlashCommand
 module.exports = {
@@ -39,8 +40,21 @@ module.exports = {
 			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Team Error! Please contact staff!'))] });
 		}
 
-		// Subcommand for ma status
-		switch (interaction.options.getSubcommand()) {
+		for (const member in res.rows[0]) {
+			if (member !== null) team.push(member);
+		}
+
+		console.log('Member', team);
+
+		team = [];
+
+		team.push(res.rows[0].slot_1, res.rows[0].slot_2, res.rows[0].slot_3, res.rows[0].slot_4);
+
+		console.log('Member', team);
+
+		const chosenSubcommand = interaction.options.getSubcommand();
+
+		switch (chosenSubcommand) {
 		case 'view':
 			await viewTeam(interaction);
 			break;
