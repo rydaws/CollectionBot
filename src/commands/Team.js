@@ -137,12 +137,14 @@ async function removeMember(interaction) {
 	console.log(`TEAM SIZE ${team.length}`);
 	console.log(`NEW ARRAY SIZE ${newArray.length}`);
 
+	console.log(`ADDING ${4 - newArray.length} NULLS`);
 	for (let i = 0; i < 4 - newArray.length; i++) {
 		newArray.push(null);
 	}
 
 	// TODO DEBUG REMOVE
 	console.log(`NEW ARRAY FINAL ${newArray}`);
+	console.log(`NEW ARRAY SIZE FINAL ${newArray.length}`);
 
 	team = newArray;
 
