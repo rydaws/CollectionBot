@@ -64,6 +64,8 @@ module.exports = {
 
 		case 'add':
 			await addMember(interaction.options.getInteger('monster_id'));
+			await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`TEAM ADD: Slot 1: ${dbteam.rows[0].slot_1} Slot 2: ${dbteam.rows[0].slot_2} Slot 3: ${dbteam.rows[0].slot_3} Slot 4: ${dbteam.rows[0].slot_4}`))] });
+
 			break;
 
 		case 'remove':
@@ -110,7 +112,7 @@ async function addMember(monster_id) {
 
 async function removeMember(slot_id) {
 	console.log('Removing member from team');
-	
+
 	team[slot_id] = null;
 
 	const newArray = [];
@@ -122,5 +124,5 @@ async function removeMember(slot_id) {
 	}
 
 	team = newArray;
-	
+
 }
