@@ -2,6 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { errorEmbed, textEmbed } = require('../util/EmbedUtil');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
+const { Commands } = require('../CommandList');
 
 let user;
 let dbteam;
@@ -61,7 +62,7 @@ module.exports = {
 
 		switch (chosenSubcommand) {
 		case 'view':
-			team = await viewTeam(interaction);
+			await viewTeam(interaction);
 			break;
 
 		case 'add':
@@ -101,13 +102,21 @@ async function addMember(interaction) {
 	const monster_id = interaction.options.getInteger('monster_id');
 
 	if (!team.includes(null)) {
-		console.log('[Team | ERROR] Team is full! Cannot add another member');
+		console.log(`[Team | ERROR] User ${user.username}'s team is full! Cannot add another member.`);
 		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Team is full! Cannot add another member'))] });
 
 		return;
 	}
 
-	// do for each loop on box array to make sure you own the monster, could do this check before to prevent waste of time
+	let hit;
+	box.rows.forEach((mon) => { if (mon.id === monster_id) hit = true; });
+
+	if (!hit) {
+		console.log(`[Team | ERROR] User ${user.username} does not own monster ${monster_id}`);
+		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You do not own that monster! View your monsters with ${Commands.box}`))] });
+
+		return;
+	}
 
 	const index = team.findIndex((member) => member === null);
 

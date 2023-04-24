@@ -5,4 +5,5 @@ module.exports.Commands = {
 	quest: '`/quest start`',
 	shop: ['`/shop view`', '`/shop buy`'],
 	backpack: '`/backpack`',
+	box: '`/box`',
 };
