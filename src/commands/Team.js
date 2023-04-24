@@ -83,7 +83,7 @@ module.exports = {
 			}
 		}
 
-		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`TEAM UPDATED: Slot 1: ${dbteam.rows[0].slot_1} Slot 2: ${dbteam.rows[0].slot_2} Slot 3: ${dbteam.rows[0].slot_3} Slot 4: ${dbteam.rows[0].slot_4}`))] });
+		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`TEAM UPDATED: Slot 1: ${team[0]} Slot 2: ${team[1]} Slot 3: ${team[2]} Slot 4: ${team[3]}`))] });
 
 
 		client.end();
