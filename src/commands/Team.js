@@ -81,10 +81,11 @@ module.exports = {
 			catch (error) {
 				console.log('error');
 			}
+			await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`TEAM UPDATED: Slot 1: ${team[0]} Slot 2: ${team[1]} Slot 3: ${team[2]} Slot 4: ${team[3]}`))] });
 		}
-
-		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`TEAM UPDATED: Slot 1: ${team[0]} Slot 2: ${team[1]} Slot 3: ${team[2]} Slot 4: ${team[3]}`))] });
-
+		else {
+			await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Slot 1: ${dbteam.rows[0].slot_1} Slot 2: ${dbteam.rows[0].slot_2} Slot 3: ${dbteam.rows[0].slot_3} Slot 4: ${dbteam.rows[0].slot_4}`))] });
+		}
 
 		client.end();
 	},
@@ -92,7 +93,6 @@ module.exports = {
 
 async function viewTeam(interaction) {
 	console.log('Viewing team...');
-	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Slot 1: ${dbteam.rows[0].slot_1} Slot 2: ${dbteam.rows[0].slot_2} Slot 3: ${dbteam.rows[0].slot_3} Slot 4: ${dbteam.rows[0].slot_4}`))] });
 
 }
 
@@ -119,7 +119,7 @@ async function addMember(interaction) {
 async function removeMember(interaction) {
 	console.log('Removing member from team');
 
-	const slot_id = interaction.options.getInteger('slot_id');
+	const slot_id = interaction.options.getInteger('slot_id') + 1;
 
 	if (slot_id > 4) {
 		console.log('no slot with that ID');
