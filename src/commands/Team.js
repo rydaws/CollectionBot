@@ -75,7 +75,7 @@ module.exports = {
 
 		if (chosenSubcommand !== 'view') {
 			try {
-				const query = `UPDATE team SET slot_1 = ${team[0]}, slot_2 = ${team[1]}, slot_3 = ${team[2]}, slot_ 4 = ${team[3]} WHERE client_id = ${user.id};`;
+				const query = `UPDATE team SET slot_1 = ${team[0]}, slot_2 = ${team[1]}, slot_3 = ${team[2]}, slot_4 = ${team[3]} WHERE client_id = ${user.id};`;
 				await client.query(query);
 			}
 			catch (error) {
