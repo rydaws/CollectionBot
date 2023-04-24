@@ -42,7 +42,7 @@ module.exports = {
 		// Subcommand for ma status
 		switch (interaction.options.getSubcommand()) {
 		case 'view':
-			viewTeam(interaction);
+			await viewTeam(interaction);
 			break;
 
 		case 'add':
