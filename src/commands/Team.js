@@ -61,7 +61,7 @@ module.exports = {
 
 		switch (chosenSubcommand) {
 		case 'view':
-			await viewTeam(interaction);
+			team = await viewTeam(interaction);
 			break;
 
 		case 'add':
@@ -91,9 +91,8 @@ module.exports = {
 	},
 };
 
-async function viewTeam(interaction) {
+async function viewTeam() {
 	console.log('Viewing team...');
-
 }
 
 async function addMember(interaction) {
@@ -119,7 +118,7 @@ async function addMember(interaction) {
 async function removeMember(interaction) {
 	console.log('Removing member from team');
 
-	const slot_id = interaction.options.getInteger('slot_id') + 1;
+	const slot_id = interaction.options.getInteger('slot_id') - 1;
 
 	if (slot_id > 4) {
 		console.log('no slot with that ID');
@@ -138,7 +137,7 @@ async function removeMember(interaction) {
 	console.log(`TEAM SIZE ${team.length}`);
 	console.log(`NEW ARRAY SIZE ${newArray.length}`);
 
-	for (let i = team.length; i < newArray.length; i++) {
+	for (let i = 0; i < 4 - newArray.length; i++) {
 		newArray.push(null);
 	}
 
