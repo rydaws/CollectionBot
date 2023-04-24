@@ -63,13 +63,11 @@ module.exports = {
 			break;
 
 		case 'add':
-			await addMember(interaction.options.getInteger('monster_id'));
-			await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`TEAM ADD: Slot 1: ${dbteam.rows[0].slot_1} Slot 2: ${dbteam.rows[0].slot_2} Slot 3: ${dbteam.rows[0].slot_3} Slot 4: ${dbteam.rows[0].slot_4}`))] });
-
+			await addMember(interaction);
 			break;
 
 		case 'remove':
-			await removeMember(interaction.options.getInteger('slot_id'));
+			await removeMember(interaction);
 			break;
 		}
 
@@ -83,6 +81,9 @@ module.exports = {
 			}
 		}
 
+		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`TEAM UPDATED: Slot 1: ${dbteam.rows[0].slot_1} Slot 2: ${dbteam.rows[0].slot_2} Slot 3: ${dbteam.rows[0].slot_3} Slot 4: ${dbteam.rows[0].slot_4}`))] });
+
+
 		client.end();
 	},
 };
@@ -93,25 +94,32 @@ async function viewTeam(interaction) {
 
 }
 
-async function addMember(monster_id) {
+async function addMember(interaction) {
 	console.log('Adding member to team');
 
-	if (!team.includes(null)) {
+	const monster_id = interaction.options.getInteger('monster_id');
 
+	if (!team.includes(null)) {
 		console.log('[Team | ERROR] Team is full! Cannot add another member');
+		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Team is full! Cannot add another member'))] });
+
+		return;
 	}
 
 	// do for each loop on box array to make sure you own the monster, could do this check before to prevent waste of time
 
-	const index = team.findIndex(null);
+	const index = team.findIndex((member) => member === null);
 
-	if (team.at(index) === null) {
-		team[index] = monster_id;
-	}
+	team[index] = monster_id;
+
 }
 
-async function removeMember(slot_id) {
+async function removeMember(interaction) {
 	console.log('Removing member from team');
+
+	const slot_id = interaction.options.getInteger('slot_id');
+
+	if (team[slot_id] === null) return;
 
 	team[slot_id] = null;
 
@@ -119,9 +127,16 @@ async function removeMember(slot_id) {
 
 	team.forEach((member) => {if (member !== null) newArray.push(member); });
 
-	for (let i = 0; i < newArray.length; i++) {
+	// TODO DEBUG REMOVE
+	console.log(`TEAM SIZE ${team.length}`);
+	console.log(`NEW ARRAY SIZE ${newArray.length}`);
+
+	for (let i = team.length; i < newArray.length; i++) {
 		newArray.push(null);
 	}
+
+	// TODO DEBUG REMOVE
+	console.log(`NEW ARRAY FINAL ${newArray}`);
 
 	team = newArray;
 
