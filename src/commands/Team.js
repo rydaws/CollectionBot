@@ -132,10 +132,14 @@ async function removeMember(interaction) {
 
 	if (slot_id > 4) {
 		console.log('no slot with that ID');
+		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Slot ${slot_id} doesn't exist! You can only have 4 members on your team.`))] });
 		return;
 	}
 
-	if (team[slot_id] === null) return;
+	if (team[slot_id] === null) {
+		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Your team has no member! Start by using ${Commands.team[0]}`))] });
+		return;
+	}
 
 	team[slot_id] = null;
 
@@ -143,21 +147,12 @@ async function removeMember(interaction) {
 
 	team.forEach((member) => {if (member !== null) newArray.push(member); });
 
-	// TODO DEBUG REMOVE
-	console.log(`TEAM SIZE ${team.length}`);
-	console.log(`NEW ARRAY SIZE ${newArray.length}`);
-
-	console.log(`ADDING ${4 - newArray.length} NULLS`);
 	const upper = 4 - newArray.length;
-	console.log(`UPPER BOUND: ${upper}`);
+
 	for (let i = 0; i < upper; i++) {
 		newArray.push(null);
 		console.log('I is: ', i);
 	}
-
-	// TODO DEBUG REMOVE
-	console.log(`NEW ARRAY FINAL ${newArray}`);
-	console.log(`NEW ARRAY SIZE FINAL ${newArray.length}`);
 
 	team = newArray;
 

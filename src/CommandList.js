@@ -6,4 +6,5 @@ module.exports.Commands = {
 	shop: ['`/shop view`', '`/shop buy`'],
 	backpack: '`/backpack`',
 	box: '`/box`',
+	team: ['`/team add`', '`/team remove`'],
 };
