@@ -52,6 +52,8 @@ module.exports = {
 			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Team Error! Please contact staff!'))] });
 		}
 
+		team = [];
+
 		// Fills team from DB into array
 		team.push(dbteam.rows[0].slot_1, dbteam.rows[0].slot_2, dbteam.rows[0].slot_3, dbteam.rows[0].slot_4);
 
@@ -73,7 +75,7 @@ module.exports = {
 
 		if (chosenSubcommand !== 'view') {
 			try {
-				const query = `UPDATE team SET slot_1 = ${team[0]}, slot_2 = ${team[1]}, slot_3 = ${team[2]}, slot_ 4 = ${team[3]};`;
+				const query = `UPDATE team SET slot_1 = ${team[0]}, slot_2 = ${team[1]}, slot_3 = ${team[2]}, slot_ 4 = ${team[3]} WHERE client_id = ${user.id};`;
 				await client.query(query);
 			}
 			catch (error) {
@@ -118,6 +120,11 @@ async function removeMember(interaction) {
 	console.log('Removing member from team');
 
 	const slot_id = interaction.options.getInteger('slot_id');
+
+	if (slot_id > 4) {
+		console.log('no slot with that ID');
+		return;
+	}
 
 	if (team[slot_id] === null) return;
 
