@@ -138,7 +138,7 @@ async function removeMember(interaction) {
 	console.log(`NEW ARRAY SIZE ${newArray.length}`);
 
 	console.log(`ADDING ${4 - newArray.length} NULLS`);
-	for (let i = 0; i < 4 - newArray.length; i++) {
+	for (let i = 0; i < (4 - newArray.length); i++) {
 		newArray.push(null);
 	}
 
