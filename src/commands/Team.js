@@ -161,7 +161,7 @@ async function removeMember(interaction) {
 
 }
 
-function createEmbed() {
+async function createEmbed() {
 
 	const embed = new EmbedBuilder()
 		.setColor(0x0099FF)
@@ -172,7 +172,7 @@ function createEmbed() {
 
 	const col = [];
 
-	const details = getMemberDetails();
+	const details = await getMemberDetails();
 	team.forEach((member) => {
 		if (member != null) {
 			col.push(`✅ ${details.rows[0].display_name} Lv: \`${details.rows[0].level}\``);
@@ -205,6 +205,5 @@ WHERE team.client_id = ${user.id} AND (team.slot_1 = box.id OR team.slot_2 = box
 		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Could not fetch your box and team! Contact staff.'))] });
 
 	}
-
 
 }
