@@ -172,14 +172,15 @@ async function createEmbed() {
 	const col = [];
 
 	const details = await getMemberDetails();
-	team.forEach((member) => {
-		if (member != null) {
-			col.push(`✅ ${details.rows[0].display_name} Lv: \`${details.rows[0].level}\``);
+
+	for (let i = 0; i < team.length; i++) {
+		if (team[i] != null) {
+			col.push(`✅ ${details.rows[i].display_name} Lv: \`${details.rows[i].level}\``);
 		}
 		else {
 			col.push('❌ Slot empty!');
 		}
-	});
+	}
 
 	embed.addFields({ name: ' ', value: `${col.join('')}`, inline: true });
 
