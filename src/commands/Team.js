@@ -50,7 +50,7 @@ module.exports = {
 			box = await client.query(query);
 		}
 		catch (error) {
-			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Team Error! Please contact staff!'))] });
+			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`Try ${Commands.start} and if issue persists, contact staff.`))] });
 		}
 
 		team = [];
@@ -89,7 +89,7 @@ module.exports = {
 };
 
 async function viewTeam(interaction) {
-	console.log('Viewing team...');
+	console.log('[TEAM] - Viewing team...');
 	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Slot 1: ${dbteam.rows[0].slot_1} Slot 2: ${dbteam.rows[0].slot_2} Slot 3: ${dbteam.rows[0].slot_3} Slot 4: ${dbteam.rows[0].slot_4}`))] });
 
 }
@@ -100,7 +100,7 @@ async function addMember(interaction) {
 	const monster_id = interaction.options.getInteger('monster_id');
 
 	if (!team.includes(null)) {
-		console.log(`[Team | ERROR] User ${user.username}'s team is full! Cannot add another member.`);
+		console.log(`[Team | ERROR] - User ${user.username}'s team is full! Cannot add another member.`);
 		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Team is full! Cannot add another member'))] });
 
 		return true;
@@ -110,7 +110,7 @@ async function addMember(interaction) {
 	box.rows.forEach((mon) => { if (mon.id === monster_id) hit = true; });
 
 	if (!hit) {
-		console.log(`[Team | ERROR] User ${user.username} does not own monster ${monster_id}`);
+		console.log(`[Team | ERROR] - User ${user.username} does not own monster ${monster_id}`);
 		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You do not own that monster! View your monsters with ${Commands.box}`))] });
 
 		return true;
@@ -132,12 +132,12 @@ async function removeMember(interaction) {
 
 	if (slot_id > 4) {
 		console.log('no slot with that ID');
-		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Slot ${slot_id} doesn't exist! You can only have 4 members on your team.`))] });
+		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`Slot ${slot_id} doesn't exist! You can only have 4 members on your team.`))] });
 		return;
 	}
 
 	if (team[slot_id] === null) {
-		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Your team has no member! Start by using ${Commands.team[0]}`))] });
+		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`Your team has no member! Start by using ${Commands.team[0]}`))] });
 		return;
 	}
 
@@ -155,5 +155,7 @@ async function removeMember(interaction) {
 	}
 
 	team = newArray;
+
+	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`TEAM UPDATED: Slot 1: ${team[0]} Slot 2: ${team[1]} Slot 3: ${team[2]} Slot 4: ${team[3]}`))] });
 
 }
