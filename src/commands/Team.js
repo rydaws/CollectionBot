@@ -3,6 +3,7 @@ const { errorEmbed, textEmbed } = require('../util/EmbedUtil');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const { Commands } = require('../CommandList');
+const { fetchMonsterDetails } = require('../monsters/MonsterDetails');
 
 let user;
 let dbteam;
@@ -90,7 +91,7 @@ module.exports = {
 
 async function viewTeam(interaction) {
 	console.log('[TEAM] - Viewing team...');
-	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Slot 1: ${dbteam.rows[0].slot_1} Slot 2: ${dbteam.rows[0].slot_2} Slot 3: ${dbteam.rows[0].slot_3} Slot 4: ${dbteam.rows[0].slot_4}`))] });
+	await interaction.reply({ embeds: [createEmbed()] });
 
 }
 
@@ -157,5 +158,53 @@ async function removeMember(interaction) {
 	team = newArray;
 
 	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`TEAM UPDATED: Slot 1: ${team[0]} Slot 2: ${team[1]} Slot 3: ${team[2]} Slot 4: ${team[3]}`))] });
+
+}
+
+function createEmbed() {
+
+	const embed = new EmbedBuilder()
+		.setColor(0x0099FF)
+		.setTitle('m')
+		.setAuthor({ name: `${user.username}'s team`, iconURL: user.avatarURL() })
+		.setDescription('Your team')
+		.setTimestamp();
+
+	const col = [];
+
+	const details = getMemberDetails();
+	team.forEach((member) => {
+		if (member != null) {
+			col.push(`✅ ${details.rows[0].display_name} Lv: \`${details.rows[0].level}\``);
+		}
+		else {
+			col.push('❌ Slot empty!');
+		}
+	});
+
+	embed.addFields({ name: ' ', value: `${col[0].join('')}`, inline: true });
+
+	return embed;
+}
+
+async function getMemberDetails(interaction) {
+	const query = `SELECT team.client_id, team.slot_1, team.slot_2, team.slot_3, team.slot_4, box.id, box.level, monsters.display_name 
+FROM team 
+INNER JOIN box ON team.client_id  = box.client_id 
+INNER JOIN monsters ON monsters.id = box.id 
+WHERE team.client_id = ${user.id} AND (team.slot_1 = box.id OR team.slot_2 = box.id OR team.slot_3 = box.id OR team.slot_4 = box.id)`
+
+	// SQL connection
+	const client = new Client(con);
+	await client.connect();
+
+	try {
+		return await client.query(query);
+	}
+	catch (error) {
+		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Could not fetch your box and team! Contact staff.'))] });
+
+	}
+
 
 }
