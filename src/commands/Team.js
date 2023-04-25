@@ -90,7 +90,7 @@ module.exports = {
 
 async function viewTeam(interaction) {
 	console.log('[TEAM] - Viewing team...');
-	await interaction.reply({ embeds: [createEmbed()] });
+	await interaction.reply({ embeds: [await createEmbed()] });
 
 }
 
