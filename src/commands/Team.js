@@ -192,7 +192,7 @@ async function getMemberDetails(interaction) {
 FROM team 
 INNER JOIN box ON team.client_id  = box.client_id 
 INNER JOIN monsters ON monsters.id = box.id 
-WHERE team.client_id = ${user.id} AND (team.slot_1 = box.id OR team.slot_2 = box.id OR team.slot_3 = box.id OR team.slot_4 = box.id)`
+WHERE team.client_id = ${user.id} AND (team.slot_1 = box.id OR team.slot_2 = box.id OR team.slot_3 = box.id OR team.slot_4 = box.id);`;
 
 	// SQL connection
 	const client = new Client(con);
