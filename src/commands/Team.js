@@ -3,7 +3,6 @@ const { errorEmbed, textEmbed } = require('../util/EmbedUtil');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const { Commands } = require('../CommandList');
-const { fetchMonsterDetails } = require('../monsters/MonsterDetails');
 
 let user;
 let dbteam;
@@ -182,7 +181,7 @@ async function createEmbed() {
 		}
 	});
 
-	embed.addFields({ name: ' ', value: `${col[0].join('')}`, inline: true });
+	embed.addFields({ name: ' ', value: `${col.join('')}`, inline: true });
 
 	return embed;
 }
