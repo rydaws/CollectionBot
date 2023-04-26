@@ -183,7 +183,7 @@ async function createEmbed() {
 
 	for (let i = 0; i < team.length; i++) {
 		if (team[i] != null) {
-			col.push(`✅ \`${details.rows[0].id}\` ${details.rows[i].display_name} Lv: \`${details.rows[i].level}\`\n`);
+			col.push(`✅ \`${details.rows[i].id}\` ${details.rows[i].display_name} Lv: \`${details.rows[i].level}\`\n`);
 		}
 		else {
 			col.push('❌ Slot empty!');
