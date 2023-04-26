@@ -164,7 +164,7 @@ async function createEmbed() {
 
 	const embed = new EmbedBuilder()
 		.setColor(0x0099FF)
-		.setTitle('m')
+		.setTitle('Your team')
 		.setAuthor({ name: `${user.username}'s team`, iconURL: user.avatarURL() })
 		.setDescription('Your team')
 		.setTimestamp();
@@ -175,7 +175,7 @@ async function createEmbed() {
 
 	for (let i = 0; i < team.length; i++) {
 		if (team[i] != null) {
-			col.push(`✅ ${details.rows[i].display_name} Lv: \`${details.rows[i].level}\``);
+			col.push(`✅ ${details.rows[i].display_name} Lv: \`${details.rows[i].level}\`\n`);
 		}
 		else {
 			col.push('❌ Slot empty!');
