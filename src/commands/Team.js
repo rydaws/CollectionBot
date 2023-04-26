@@ -103,7 +103,14 @@ async function addMember(interaction) {
 		console.log(`[Team | ERROR] - User ${user.username}'s team is full! Cannot add another member.`);
 		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Team is full! Cannot add another member'))] });
 
-		return true;
+		return;
+	}
+
+	if (team.includes(monster_id)) {
+		console.log(`[Team | ERROR] - User ${user.username}'s team already has this member!`);
+		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Team already has this member! Try adding a different one.'))] });
+
+		return;
 	}
 
 	let hit;
@@ -126,6 +133,7 @@ async function addMember(interaction) {
 }
 
 async function removeMember(interaction) {
+	// TODO change from slot_id to monster_id
 	console.log('Removing member from team');
 
 	const slot_id = interaction.options.getInteger('slot_id') - 1;
@@ -175,7 +183,7 @@ async function createEmbed() {
 
 	for (let i = 0; i < team.length; i++) {
 		if (team[i] != null) {
-			col.push(`✅ ${details.rows[i].display_name} Lv: \`${details.rows[i].level}\`\n`);
+			col.push(`✅ \`${details.rows[0].id}\` ${details.rows[i].display_name} Lv: \`${details.rows[i].level}\`\n`);
 		}
 		else {
 			col.push('❌ Slot empty!');
