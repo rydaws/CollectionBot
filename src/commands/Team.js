@@ -9,7 +9,7 @@ let size;
 let box;
 const team = [];
 
-const TEAM_SIZE = 4
+const TEAM_SIZE = 4;
 
 // Incoming SlashCommand
 module.exports = {
