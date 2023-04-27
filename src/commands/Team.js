@@ -172,7 +172,6 @@ async function createEmbed() {
 		.setColor(0x0099FF)
 		.setTitle('Your team')
 		.setAuthor({ name: `${user.username}'s team`, iconURL: user.avatarURL() })
-		.setDescription('Your team')
 		.setTimestamp();
 
 	const col = [];
@@ -186,7 +185,7 @@ async function createEmbed() {
 	const upper = TEAM_SIZE - size;
 
 	for (let i = 0; i < upper; i++) {
-		col.push('❌ Slot empty!');
+		col.push('❌ Slot empty!\n');
 	}
 
 	embed.addFields({ name: ' ', value: `${col.join('')}`, inline: true });
