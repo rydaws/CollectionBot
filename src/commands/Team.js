@@ -100,7 +100,7 @@ module.exports = {
 				if (returned === false) {
 					await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Could not save your team! Contact staff!'))] });
 					returned = true;
-					console.log('UPDATE ERROR');
+					console.log(`[Team | ERROR - Could not save team to ${user.username}'s box!]`);
 				}
 			}
 		}
@@ -114,7 +114,6 @@ module.exports = {
 };
 
 async function addMember(interaction, targetName) {
-	console.log('Adding member to team');
 
 	// Checks to see if their team of TEAM_SIZE is full
 	if (size === TEAM_SIZE) {
@@ -147,13 +146,13 @@ async function addMember(interaction, targetName) {
 		return;
 	}
 
+	console.log(`[Team] - Adding ${targetName} to ${user.username}'s active team.`);
+
 	return true;
 
 }
 
 async function removeMember(interaction, targetName) {
-
-	console.log('Removing member from team');
 
 	if (!team.includes(targetName)) {
 		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`Your team has no such member! Start by using ${Commands.team[0]}`))] });
@@ -162,7 +161,7 @@ async function removeMember(interaction, targetName) {
 		return;
 	}
 
-	console.log('Remove returning false');
+	console.log(`[Team] - Removing ${targetName} from ${user.username}'s active team.`);
 	return false;
 
 }
