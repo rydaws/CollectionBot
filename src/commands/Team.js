@@ -32,7 +32,7 @@ module.exports = {
 			subcommand
 				.setName('remove')
 				.setDescription('Remove monsters from your team')
-				.addIntegerOption(name =>
+				.addStringOption(name =>
 					name.setName('name')
 						.setDescription('Name of monster to remove from your team')
 						.setRequired(true))),
@@ -40,7 +40,7 @@ module.exports = {
 		// ID of user who "owns" this embed
 		user = interaction.user;
 
-		const targetName = interaction.options.getInteger('name');
+		const targetName = interaction.options.getString('name');
 
 		// SQL connection
 		const client = new Client(con);
