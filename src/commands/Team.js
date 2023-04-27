@@ -9,7 +9,7 @@ let size;
 let box;
 let dbteam;
 let returned;
-const team = [];
+let team = [];
 
 const TEAM_SIZE = 4;
 
@@ -59,14 +59,18 @@ module.exports = {
 			box = await client.query(getDB);
 		}
 		catch (error) {
-			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`Try ${Commands.start} and if issue persists, contact staff.`))] });
-			returned = true;
+			if (returned === false) {
+				await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`Try ${Commands.start} and if issue persists, contact staff.`))] });
+				returned = true;
+			}
 		}
 
 		size = Object.keys(box.rows).length;
 
 		const chosenSubcommand = interaction.options.getSubcommand();
 
+		team = [];
+		// Saves active team to array
 		box.rows.forEach((member) => {
 			team.push(member.display_name);
 		});
