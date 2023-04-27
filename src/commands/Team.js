@@ -89,7 +89,7 @@ module.exports = {
 				const query = `UPDATE box SET active = ${status} WHERE client_id = ${user.id} AND id = (SELECT id FROM monsters WHERE display_name = ${targetName});`;
 				await client.query(query);
 
-				box = client.query(getDB);
+				box = await client.query(getDB);
 			}
 			catch (error) {
 				await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Could not save your team! Contact staff!'))] });
