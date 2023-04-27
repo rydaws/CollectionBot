@@ -181,6 +181,8 @@ async function createEmbed() {
 		col.push(`✅ \`${member.id}\` ${member.display_name} Lv: \`${member.level}\`\n`);
 	});
 
+	size = Object.keys(box.rows).length;
+
 	const upper = TEAM_SIZE - size;
 
 	for (let i = 0; i < upper; i++) {
