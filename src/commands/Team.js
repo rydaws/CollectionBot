@@ -82,19 +82,17 @@ module.exports = {
 			break;
 		}
 
-
-		try {
-			if (chosenSubcommand !== 'view') {
+		if (chosenSubcommand !== 'view') {
+			try {
 				const query = `UPDATE box SET active = ${status} WHERE client_id = ${user.id} AND id = (SELECT id FROM monsters WHERE display_name = targetName);`;
 				await client.query(query);
+
+				box = client.query(getDB);
 			}
-
-			box = client.query(getDB);
+			catch (error) {
+				console.log('UPDATE ERROR');
+			}
 		}
-		catch (error) {
-			console.log('UPDATE ERROR');
-		}
-
 
 		if (returned === false) {
 			await interaction.reply({ embeds: [await createEmbed()] });
