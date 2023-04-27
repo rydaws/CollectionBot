@@ -92,9 +92,11 @@ module.exports = {
 				box = await client.query(getDB);
 			}
 			catch (error) {
-				await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Could not save your team! Contact staff!'))] });
-				returned = true;
-				console.log('UPDATE ERROR');
+				if (returned === false) {
+					await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Could not save your team! Contact staff!'))] });
+					returned = true;
+					console.log('UPDATE ERROR');
+				}
 			}
 		}
 
