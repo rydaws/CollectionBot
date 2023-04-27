@@ -8,7 +8,7 @@ let user;
 let size;
 let box;
 let dbteam;
-let returned = false;
+let returned;
 const team = [];
 
 const TEAM_SIZE = 4;
@@ -43,6 +43,8 @@ module.exports = {
 		user = interaction.user;
 
 		const targetName = interaction.options.getString('name');
+
+		returned = false;
 
 		// SQL connection
 		const client = new Client(con);
