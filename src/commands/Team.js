@@ -7,6 +7,8 @@ const { Commands } = require('../CommandList');
 let user;
 let size;
 let box;
+let dbteam;
+let returned = false;
 const team = [];
 
 const TEAM_SIZE = 4;
@@ -46,12 +48,17 @@ module.exports = {
 		const client = new Client(con);
 		await client.connect();
 
+		const getDB = `SELECT box.client_id, box.id, box.level, box.active, monsters.display_name from box INNER JOIN monsters ON box.id = monsters.id WHERE client_id = ${user.id} AND active = true ORDER BY box.id;`;
+
 		try {
-			const query = `SELECT box.client_id, box.id, box.level, box.active, monsters.display_name from box INNER JOIN monsters ON box.id = monsters.id WHERE client_id = ${user.id} AND active = true ORDER BY box.id;`;
-			box = await client.query(query);
+			const query = `SELECT box.id, monsters.display_name FROM box INNER JOIN monsters ON box.id = monsters.id WHERE client_id = ${user.id};`;
+			dbteam = await client.query(query);
+
+			box = await client.query(getDB);
 		}
 		catch (error) {
 			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`Try ${Commands.start} and if issue persists, contact staff.`))] });
+			returned = true;
 		}
 
 		size = Object.keys(box.rows).length;
@@ -75,17 +82,23 @@ module.exports = {
 			break;
 		}
 
-		if (chosenSubcommand !== 'view') {
-			try {
+
+		try {
+			if (chosenSubcommand !== 'view') {
 				const query = `UPDATE box SET active = ${status} WHERE client_id = ${user.id} AND id = (SELECT id FROM monsters WHERE display_name = targetName);`;
 				await client.query(query);
 			}
-			catch (error) {
-				console.log('error');
-			}
+
+			box = client.query(getDB);
+		}
+		catch (error) {
+			console.log('UPDATE ERROR');
 		}
 
-		await interaction.reply({ embeds: [await createEmbed()] });
+
+		if (returned === false) {
+			await interaction.reply({ embeds: [await createEmbed()] });
+		}
 
 		client.end();
 	},
@@ -99,6 +112,7 @@ async function addMember(interaction, targetName) {
 		console.log(`[Team | ERROR] - User ${user.username}'s team is full! Cannot add another member.`);
 		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Team is full! Cannot add another member'))] });
 
+		returned = true;
 		return;
 	}
 
@@ -107,17 +121,20 @@ async function addMember(interaction, targetName) {
 		console.log(`[Team | ERROR] - User ${user.username}'s team already has this member!`);
 		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Team already has this member! Try adding a different one.'))] });
 
+		returned = true;
 		return;
 	}
 
 	let hit;
+
 	// Checks to see if user owns monsters
-	box.rows.forEach((mon) => { if (mon.display_name === targetName) hit = true; });
+	dbteam.rows.forEach((mon) => { if (mon.display_name === targetName) hit = true; });
 
 	if (!hit) {
 		console.log(`[Team | ERROR] - User ${user.username} does not own monster ${targetName}`);
 		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You do not own that monster! View your monsters with ${Commands.box}`))] });
 
+		returned = true;
 		return;
 	}
 
@@ -131,9 +148,12 @@ async function removeMember(interaction, targetName) {
 
 	if (!team.includes(targetName)) {
 		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`Your team has no such member! Start by using ${Commands.team[0]}`))] });
+
+		returned = true;
 		return;
 	}
 
+	console.log('Remove returning false');
 	return false;
 
 }
