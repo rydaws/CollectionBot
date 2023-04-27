@@ -104,6 +104,9 @@ module.exports = {
 				}
 			}
 		}
+		else {
+			console.log(`[Team] - Viewing ${user.username}'s active team.`);
+		}
 
 		if (returned === false) {
 			await interaction.reply({ embeds: [await createEmbed()] });
