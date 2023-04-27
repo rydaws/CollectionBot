@@ -93,7 +93,7 @@ module.exports = {
 				const query = `UPDATE box SET active = ${status} WHERE client_id = ${user.id} AND id = (SELECT id FROM monsters WHERE display_name = ${targetName});`;
 				await client.query(query);
 
-				box = await client.query(getDB);
+				// box = await client.query(getDB);
 			}
 			catch (error) {
 				if (returned === false) {
