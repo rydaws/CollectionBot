@@ -90,7 +90,7 @@ module.exports = {
 
 		if (chosenSubcommand !== 'view') {
 			try {
-				const query = `UPDATE box SET active = true WHERE client_id = ${user.id} AND id = (SELECT id FROM monsters WHERE display_name = ${targetName});`;
+				const query = `UPDATE box SET active = ${status} WHERE client_id = ${user.id} AND id = (SELECT id FROM monsters WHERE display_name = '${targetName}');`;
 				await client.query(query);
 
 				box = await client.query(getDB);
