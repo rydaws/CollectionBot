@@ -9,6 +9,8 @@ let size;
 let box;
 const team = [];
 
+const TEAM_SIZE = 4
+
 // Incoming SlashCommand
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -92,8 +94,8 @@ module.exports = {
 async function addMember(interaction, targetName) {
 	console.log('Adding member to team');
 
-	// Checks to see if their team of 4 is full
-	if (size === 4) {
+	// Checks to see if their team of TEAM_SIZE is full
+	if (size === TEAM_SIZE) {
 		console.log(`[Team | ERROR] - User ${user.username}'s team is full! Cannot add another member.`);
 		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Team is full! Cannot add another member'))] });
 
@@ -151,7 +153,9 @@ async function createEmbed() {
 		col.push(`✅ \`${member.id}\` ${member.display_name} Lv: \`${member.level}\`\n`);
 	});
 
-	for (let i = 0; i < size; i++) {
+	const upper = TEAM_SIZE - size;
+
+	for (let i = 0; i < upper; i++) {
 		col.push('❌ Slot empty!');
 	}
 
