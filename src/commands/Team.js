@@ -44,6 +44,7 @@ module.exports = {
 
 		const targetName = interaction.options.getString('name');
 
+		// Discord.js check for if embed was already returned
 		returned = false;
 
 		// SQL connection
@@ -140,7 +141,7 @@ async function addMember(interaction, targetName) {
 
 	if (!hit) {
 		console.log(`[Team | ERROR] - User ${user.username} does not own monster ${targetName}`);
-		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You do not own that monster! View your monsters with ${Commands.box}`))] });
+		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You do not own that monster or spelling is wrong, (CaSe SeNsItIvE)! View your monsters with ${Commands.box}`))] });
 
 		returned = true;
 		return;
