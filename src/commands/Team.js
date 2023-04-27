@@ -1,13 +1,13 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { errorEmbed, textEmbed } = require('../util/EmbedUtil');
+const { errorEmbed } = require('../util/EmbedUtil');
 const { con } = require('../util/QueryUtil');
 const { Client } = require('pg');
 const { Commands } = require('../CommandList');
 
 let user;
-let dbteam;
+let size;
 let box;
-let team = [];
+const team = [];
 
 // Incoming SlashCommand
 module.exports = {
@@ -22,61 +22,60 @@ module.exports = {
 			subcommand
 				.setName('add')
 				.setDescription('Add monsters to your team.')
-				.addIntegerOption(monster_id =>
-					monster_id.setName('monster_id')
-						.setDescription('ID of monster to add to your team')
+				.addStringOption(name =>
+					name.setName('name')
+						.setDescription('Name of monster to add to your team')
 						.setRequired(true)))
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName('remove')
 				.setDescription('Remove monsters from your team')
-				.addIntegerOption(slot_id =>
-					slot_id.setName('slot_id')
-						.setDescription('Slot number of monster to remove from your team')
+				.addIntegerOption(name =>
+					name.setName('name')
+						.setDescription('Name of monster to remove from your team')
 						.setRequired(true))),
 	async execute(interaction) {
 		// ID of user who "owns" this embed
 		user = interaction.user;
+
+		const targetName = interaction.options.getInteger('name');
 
 		// SQL connection
 		const client = new Client(con);
 		await client.connect();
 
 		try {
-			let query = `SELECT * FROM team WHERE client_id = ${user.id};`;
-			dbteam = await client.query(query);
-
-			query = `SELECT box.client_id, box.id, box.level, monsters.display_name from box INNER JOIN monsters ON box.id = monsters.id WHERE client_id = ${user.id} ORDER BY box.id;`;
+			const query = `SELECT box.client_id, box.id, box.level, box.active, monsters.display_name from box INNER JOIN monsters ON box.id = monsters.id WHERE client_id = ${user.id} AND active = true ORDER BY box.id;`;
 			box = await client.query(query);
 		}
 		catch (error) {
 			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`Try ${Commands.start} and if issue persists, contact staff.`))] });
 		}
 
-		team = [];
-
-		// Fills team from DB into array
-		team.push(dbteam.rows[0].slot_1, dbteam.rows[0].slot_2, dbteam.rows[0].slot_3, dbteam.rows[0].slot_4);
+		size = Object.keys(box.rows).length;
 
 		const chosenSubcommand = interaction.options.getSubcommand();
 
+		box.rows.forEach((member) => {
+			team.push(member.display_name);
+		});
+
+		let status;
+
 		switch (chosenSubcommand) {
-		case 'view':
-			await viewTeam(interaction);
-			break;
 
 		case 'add':
-			await addMember(interaction);
+			status = await addMember(interaction, targetName);
 			break;
 
 		case 'remove':
-			await removeMember(interaction);
+			status = await removeMember(interaction, targetName);
 			break;
 		}
 
 		if (chosenSubcommand !== 'view') {
 			try {
-				const query = `UPDATE team SET slot_1 = ${team[0]}, slot_2 = ${team[1]}, slot_3 = ${team[2]}, slot_4 = ${team[3]} WHERE client_id = ${user.id};`;
+				const query = `UPDATE box SET active = ${status} WHERE client_id = ${user.id} AND id = (SELECT id FROM monsters WHERE display_name = targetName);`;
 				await client.query(query);
 			}
 			catch (error) {
@@ -84,29 +83,25 @@ module.exports = {
 			}
 		}
 
+		await interaction.reply({ embeds: [await createEmbed()] });
+
 		client.end();
 	},
 };
 
-async function viewTeam(interaction) {
-	console.log('[TEAM] - Viewing team...');
-	await interaction.reply({ embeds: [await createEmbed()] });
-
-}
-
-async function addMember(interaction) {
+async function addMember(interaction, targetName) {
 	console.log('Adding member to team');
 
-	const monster_id = interaction.options.getInteger('monster_id');
-
-	if (!team.includes(null)) {
+	// Checks to see if their team of 4 is full
+	if (size === 4) {
 		console.log(`[Team | ERROR] - User ${user.username}'s team is full! Cannot add another member.`);
 		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Team is full! Cannot add another member'))] });
 
 		return;
 	}
 
-	if (team.includes(monster_id)) {
+	// Checks to see if user already has that monster active
+	if (team.includes(targetName)) {
 		console.log(`[Team | ERROR] - User ${user.username}'s team already has this member!`);
 		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Team already has this member! Try adding a different one.'))] });
 
@@ -114,57 +109,30 @@ async function addMember(interaction) {
 	}
 
 	let hit;
-	box.rows.forEach((mon) => { if (mon.id === monster_id) hit = true; });
+	// Checks to see if user owns monsters
+	box.rows.forEach((mon) => { if (mon.display_name === targetName) hit = true; });
 
 	if (!hit) {
-		console.log(`[Team | ERROR] - User ${user.username} does not own monster ${monster_id}`);
+		console.log(`[Team | ERROR] - User ${user.username} does not own monster ${targetName}`);
 		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You do not own that monster! View your monsters with ${Commands.box}`))] });
 
-		return true;
+		return;
 	}
 
-	const index = team.findIndex((member) => member === null);
-
-	team[index] = monster_id;
-
-	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`TEAM UPDATED: Slot 1: ${team[0]} Slot 2: ${team[1]} Slot 3: ${team[2]} Slot 4: ${team[3]}`))] });
-
+	return true;
 
 }
 
-async function removeMember(interaction) {
-	// TODO change from slot_id to monster_id
+async function removeMember(interaction, targetName) {
+
 	console.log('Removing member from team');
 
-	const slot_id = interaction.options.getInteger('slot_id') - 1;
-
-	if (slot_id > 4) {
-		console.log('no slot with that ID');
-		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`Slot ${slot_id} doesn't exist! You can only have 4 members on your team.`))] });
+	if (!team.includes(targetName)) {
+		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`Your team has no such member! Start by using ${Commands.team[0]}`))] });
 		return;
 	}
 
-	if (team[slot_id] === null) {
-		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`Your team has no member! Start by using ${Commands.team[0]}`))] });
-		return;
-	}
-
-	team[slot_id] = null;
-
-	const newArray = [];
-
-	team.forEach((member) => {if (member !== null) newArray.push(member); });
-
-	const upper = 4 - newArray.length;
-
-	for (let i = 0; i < upper; i++) {
-		newArray.push(null);
-		console.log('I is: ', i);
-	}
-
-	team = newArray;
-
-	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`TEAM UPDATED: Slot 1: ${team[0]} Slot 2: ${team[1]} Slot 3: ${team[2]} Slot 4: ${team[3]}`))] });
+	return false;
 
 }
 
@@ -179,15 +147,12 @@ async function createEmbed() {
 
 	const col = [];
 
-	const details = await getMemberDetails();
+	box.rows.forEach((member) => {
+		col.push(`✅ \`${member.id}\` ${member.display_name} Lv: \`${member.level}\`\n`);
+	});
 
-	for (let i = 0; i < team.length; i++) {
-		if (team[i] != null) {
-			col.push(`✅ \`${details.rows[i].id}\` ${details.rows[i].display_name} Lv: \`${details.rows[i].level}\`\n`);
-		}
-		else {
-			col.push('❌ Slot empty!');
-		}
+	for (let i = 0; i < size; i++) {
+		col.push('❌ Slot empty!');
 	}
 
 	embed.addFields({ name: ' ', value: `${col.join('')}`, inline: true });
@@ -195,23 +160,3 @@ async function createEmbed() {
 	return embed;
 }
 
-async function getMemberDetails(interaction) {
-	const query = `SELECT team.client_id, team.slot_1, team.slot_2, team.slot_3, team.slot_4, box.id, box.level, monsters.display_name 
-FROM team 
-INNER JOIN box ON team.client_id  = box.client_id 
-INNER JOIN monsters ON monsters.id = box.id 
-WHERE team.client_id = ${user.id} AND (team.slot_1 = box.id OR team.slot_2 = box.id OR team.slot_3 = box.id OR team.slot_4 = box.id);`;
-
-	// SQL connection
-	const client = new Client(con);
-	await client.connect();
-
-	try {
-		return await client.query(query);
-	}
-	catch (error) {
-		await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Could not fetch your box and team! Contact staff.'))] });
-
-	}
-
-}
