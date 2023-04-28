@@ -39,7 +39,7 @@ module.exports = {
 						.setDescription('Name of monster to remove from your team')
 						.setRequired(true))),
 	async execute(interaction) {
-		// ID of user who "owns" this embed
+		// User who "owns" this embed
 		user = interaction.user;
 
 		const targetName = interaction.options.getString('name');
