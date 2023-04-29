@@ -67,6 +67,7 @@ module.exports = {
 			break;
 
 		case 'start':
+			await questStart(interaction);
 			break;
 
 		}
@@ -78,6 +79,12 @@ async function questStatus(interaction) {
 	const startTime = deployments.rows[0].start_at;
 	const endTime = deployments.rows[0].end_at;
 
-	
+
+}
+
+async function questStart(interaction) {
+	const date = new Date();
+	console.log('Date ', date.getDate());
+	console.log('Time ', date.getTime());
 
 }
