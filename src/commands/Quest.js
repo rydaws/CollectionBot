@@ -96,7 +96,7 @@ async function questStatus(interaction) {
 
 	if (isQuestActive === 'Ended') {
 		team.rows.forEach((monster) => gainExperience(interaction, monster.id, monster.level, monster.xp, experienceToGive));
-		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed('Adding XP'))] });
+
 
 	}
 	else {
@@ -119,10 +119,12 @@ async function questStart(interaction) {
 	}
 	catch (error) {
 		console.log('start error');
+		return;
 	}
 
 	// TODO add 'Quest started!'
 
+	console.log('quest successfully started');
 	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed('started quest'))] });
 
 	client.end();
@@ -140,7 +142,7 @@ async function levelUp(interaction, monster_id, currentLevel) {
 
 	try {
 		// Update monster level and reset experience points
-		let query = `UPDATE box SET level = ${currentLevel} AND SET xp = 0 WHERE id = ${monster_id};`;
+		let query = `UPDATE box SET level = ${currentLevel} AND SET xp = 0 WHERE id = ${monster_id} AND active = true;`;
 		await client.query(query);
 
 		// Delete record from this deployment
