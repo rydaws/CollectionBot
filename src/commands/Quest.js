@@ -75,7 +75,7 @@ module.exports = {
 		case 'start':
 
 			if (Object.keys(deployments.rows).length === 0) {
-				await questStart(interaction, teamSize);
+				await questStart(interaction);
 			}
 			else {
 				await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You can only have 1 active quest! Check your current quest status with ${Commands.quest[0]}.`))] });
@@ -105,16 +105,17 @@ async function questStatus(interaction) {
 	}
 }
 
-async function questStart(interaction, teamSize) {
+async function questStart(interaction) {
 
 	const client = new Client(con);
 	await client.connect();
 
+
 	try {
-		for (let i = 0; i < teamSize; i++) {
-			await client.query(`INSERT INTO deployments (client_id, id, start_time, end_time)
-						VALUES (${user.id}, ${team.rows[i].id}, NOW(), NOW() + INTERVAL '2 minutes');`);
-		}
+		team.rows.forEach((member) => {
+			client.query(`INSERT INTO deployments (client_id, id, start_time, end_time)
+						VALUES (${user.id}, ${member.id}, NOW(), NOW() + INTERVAL '2 minutes');`);
+		});
 	}
 	catch (error) {
 		console.log('start error');
