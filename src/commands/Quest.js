@@ -91,6 +91,13 @@ module.exports = {
 					console.log('delete up error');
 				}
 
+				// TODO DEBUG REMOVE
+				console.log('Col length before calling embed ', col.length);
+				await interaction.reply({ embeds: [createEmbed()] });
+
+			}
+			else {
+				await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`You have a quest active that has ${Math.round(10 * deployments.rows[0].status) / 10} hours left.`))] });
 			}
 
 			break;
@@ -112,25 +119,18 @@ module.exports = {
 	},
 };
 
-async function questStatus(interaction) {
+function questStatus() {
 	const isQuestActive = deployments.rows[0].status;
 
 	// Random XP between 50 and 150 ((Max - Min + 1) + min)
 	const experienceToGive = Math.floor(Math.random() * (150 - 50 + 1) + 50);
 
 	if (isQuestActive === 'Ended') {
-		await team.rows.forEach((monster) => gainExperience(interaction, monster.id, monster.display_name, monster.level, monster.xp, experienceToGive).then(async () => {
-			// TODO DEBUG REMOVE
-			console.log('Col length before calling embed ', col.length);
-			await interaction.reply({ embeds: [createEmbed()] });
-
-		}));
-
+		team.rows.forEach((monster) => gainExperience(monster.id, monster.display_name, monster.level, monster.xp, experienceToGive));
 
 		return true;
 	}
 	else {
-		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`You have a quest active that has ${Math.round(10 * isQuestActive) / 10} hours left.`))] });
 
 		return false;
 	}
@@ -163,7 +163,7 @@ async function questStart(interaction) {
 
 }
 
-async function levelUp(interaction, monster_id, monster_name, currentLevel) {
+function levelUp(monster_id, monster_name, currentLevel) {
 
 	currentLevel++;
 	const experienceRequired = calculateExperienceRequired(currentLevel);
@@ -171,50 +171,25 @@ async function levelUp(interaction, monster_id, monster_name, currentLevel) {
 
 	console.log(`Congratulations! Your Monster has reached level ${currentLevel}. They need ${experienceRequired} experience to reach the next level.`);
 
-	const client = new Client(con);
-	await client.connect();
-
-	try {
-		// Update monster level and reset experience points
-		const query = `UPDATE box SET level = ${currentLevel}, xp = 0 WHERE client_id = ${user.id} AND id = ${monster_id} AND active = true;`;
-		await client.query(query);
-
-	}
-	catch (error) {
-		console.log('level up error');
-	}
-
 	col.push(`⏫ ${monster_name} has leveled up to \`${currentLevel}\`!`);
 	console.log('Col length after levelUp push ', col.length);
 
-	client.end();
+	updateDB('addExperience', monster_id, currentLevel).then(() => console.log('DB level up success'));
 
 }
 
-async function gainExperience(interaction, monster_id, monster_name, currentLevel, currentExperience, amount) {
+function gainExperience(monster_id, monster_name, currentLevel, currentExperience, amount) {
 	currentExperience += amount;
 	const experienceRequired = calculateExperienceRequired(currentLevel);
 	if (currentExperience >= experienceRequired) {
-		await levelUp(interaction, monster_id, monster_name, currentLevel);
+		levelUp(monster_id, monster_name, currentLevel);
 	}
 	else {
-
-		const client = new Client(con);
-		await client.connect();
-
-		try {
-			const query = `UPDATE box SET xp = ${currentExperience} WHERE client_id = ${user.id} AND id = ${monster_id} AND active = true;;`;
-			await client.query(query);
-
-		}
-		catch (error) {
-			console.log('gain experience error');
-		}
 
 		col.push(`🔼 ${monster_name} has gained \`${amount}\` XP!`);
 		console.log('Col length after XP push ', col.length);
 
-		client.end();
+		updateDB('addExperience', monster_id, currentExperience).then(() => console.log('DB XP Up success'));
 	}
 
 }
@@ -234,4 +209,39 @@ function createEmbed() {
 	embed.addFields({ name: ' ', value: `${col.join('')}`, inline: true });
 
 	return embed;
+}
+
+async function updateDB(command, monster_id, updatedValue) {
+
+	const client = new Client(con);
+	await client.connect();
+
+	let query;
+	switch (command) {
+	case 'addExperience':
+
+		try {
+			query = `UPDATE box SET xp = ${updatedValue} WHERE client_id = ${user.id} AND id = ${monster_id} AND active = true;`;
+			await client.query(query);
+		}
+		catch (error) {
+			console.log('gain experience error');
+		}
+
+		break;
+	case 'levelUp':
+		try {
+			// Update monster level and reset experience points
+			query = `UPDATE box SET level = ${updatedValue}, xp = 0 WHERE client_id = ${user.id} AND id = ${monster_id} AND active = true;`;
+			await client.query(query);
+
+		}
+		catch (error) {
+			console.log('level up error');
+		}
+		break;
+	}
+
+	client.end();
+
 }
