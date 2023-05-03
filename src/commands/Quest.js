@@ -29,7 +29,7 @@ module.exports = {
 		await client.connect();
 
 		try {
-			let query = `SELECT timeoutid, start_time, end_time,
+			let query = `SELECT start_time, end_time,
 							  CASE 
 								WHEN end_time < NOW() THEN 'Ended' 
 								ELSE CONCAT(EXTRACT(epoch FROM (end_time - NOW()))/3600)
