@@ -90,9 +90,7 @@ module.exports = {
 				catch (error) {
 					console.log('delete up error');
 				}
-				// TODO DEBUG REMOVE
-				console.log('Col length before calling embed ', col.length);
-				await interaction.reply({ embeds: [await createEmbed()] });
+
 			}
 
 			break;
@@ -123,11 +121,16 @@ async function questStatus(interaction) {
 	if (isQuestActive === 'Ended') {
 		team.rows.forEach((monster) => gainExperience(interaction, monster.id, monster.display_name, monster.level, monster.xp, experienceToGive));
 
+		// TODO DEBUG REMOVE
+		console.log('Col length before calling embed ', col.length);
+		await interaction.reply({ embeds: [await createEmbed()] });
+
 		return true;
 	}
 	else {
 		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`You have a quest active that has ${Math.round(10 * isQuestActive) / 10} hours left.`))] });
 
+		return false;
 	}
 
 }
