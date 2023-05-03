@@ -74,13 +74,12 @@ module.exports = {
 
 		case 'start':
 
-			if (Object.keys(deployments.rows).length !== 0) {
+			if (Object.keys(deployments.rows).length === 0) {
 				await questStart(interaction, teamSize);
 			}
 			else {
 				await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You can only have 1 active quest! Check your current quest status with ${Commands.quest[0]}.`))] });
 			}
-
 
 			break;
 
@@ -107,7 +106,6 @@ async function questStatus(interaction) {
 }
 
 async function questStart(interaction, teamSize) {
-	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed('TODO Start quest!'))] });
 
 	const client = new Client(con);
 	await client.connect();
