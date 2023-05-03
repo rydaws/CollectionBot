@@ -74,7 +74,14 @@ module.exports = {
 
 		case 'start':
 
-			await questStart(interaction);
+			if (Object.keys(deployments.rows).length !== 0) {
+				await questStart(interaction, teamSize);
+			}
+			else {
+				await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed(`You can only have 1 active quest! Check your current quest status with ${Commands.quest[0]}.`))] });
+			}
+
+
 			break;
 
 		}
@@ -85,9 +92,12 @@ module.exports = {
 async function questStatus(interaction) {
 	const isQuestActive = deployments.rows[0].status;
 
+	// Random XP between 50 and 150 ((Max - Min + 1) + min)
+	const experienceToGive = Math.floor(Math.random() * (150 - 50 + 1) + 50);
+
 	if (isQuestActive === 'Ended') {
-		addXP();
-		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed('TODO Adding XP'))] });
+		team.forEach((monster) => gainExperience(interaction, monster.id, monster.level, monster.xp, experienceToGive));
+		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed('Adding XP'))] });
 
 	}
 	else {
@@ -96,10 +106,80 @@ async function questStatus(interaction) {
 	}
 }
 
-async function questStart(interaction) {
+async function questStart(interaction, teamSize) {
 	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed('TODO Start quest!'))] });
 
+	const client = new Client(con);
+	await client.connect();
+
+	try {
+		for (let i = 0; i < teamSize; i++) {
+			await client.query(`INSERT INTO deployments (client_id, id, start_time, end_time)
+						VALUES (${user.id}, ${team.rows[i]}, NOW() + INTERVAL '2 minutes');`);
+		}
+	}
+	catch (error) {
+		console.log('start error');
+	}
+
+	// TODO add 'Quest started!'
+
+	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed('started quest'))] });
+
+	client.end();
+
 }
-function addXP() {
-	console.log('adding xp...');
+
+async function levelUp(interaction, monster_id, currentLevel) {
+
+	currentLevel++;
+	const experienceRequired = calculateExperienceRequired(currentLevel);
+	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Congratulations! Your Monster has reached level ${currentLevel}. They need ${experienceRequired} experience to reach the next level.`))] });
+
+	const client = new Client(con);
+	await client.connect();
+
+	try {
+		// Update monster level and reset experience points
+		let query = `UPDATE box SET level = ${currentLevel} AND SET xp = 0 WHERE id = ${monster_id};`;
+		await client.query(query);
+
+		// Delete record from this deployment
+		query = `DELETE FROM deployments WHERE client_id = ${user.id};`;
+		await client.query(query);
+	}
+	catch (error) {
+		console.log('level up error');
+	}
+
+	client.end();
+
+}
+
+async function gainExperience(interaction, monster_id, currentLevel, currentExperience, amount) {
+	currentExperience += amount;
+	const experienceRequired = calculateExperienceRequired(currentLevel);
+	if (currentExperience >= experienceRequired) {
+		await levelUp(interaction, monster_id, currentLevel);
+	}
+	else {
+
+		const client = new Client(con);
+		await client.connect();
+
+		try {
+			const query = `UPDATE box SET xp = ${currentExperience};`;
+			await client.query(query);
+		}
+		catch (error) {
+			console.log('gain experience error');
+		}
+
+		client.end();
+	}
+	// TODO add 'You earned XXX experience!'
+}
+
+function calculateExperienceRequired(currentLevel) {
+	return currentLevel * currentLevel * 100;
 }
