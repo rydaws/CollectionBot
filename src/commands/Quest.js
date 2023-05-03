@@ -37,7 +37,7 @@ module.exports = {
 								ELSE CONCAT(EXTRACT(epoch FROM (end_time - NOW()))/3600)
 							  END AS status
 							FROM deployments
-							WHERE client_id = 100053570027520000;`;
+							WHERE client_id = ${user.id};`;
 			deployments = await client.query(query);
 
 			query = `SELECT box.id, box.level, box.active, box.xp, monsters.display_name 
