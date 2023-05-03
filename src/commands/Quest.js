@@ -8,7 +8,6 @@ let user;
 let deployments;
 let team;
 let col = [];
-const QUEST_LENGTH = '2 minutes';
 
 // Incoming SlashCommand
 module.exports = {
@@ -139,7 +138,7 @@ async function questStart(interaction) {
 	try {
 		team.rows.forEach((member) => {
 			client.query(`INSERT INTO deployments (client_id, id, start_time, end_time)
-						VALUES (${user.id}, ${member.id}, NOW(), NOW() + INTERVAL ${QUEST_LENGTH});`);
+						VALUES (${user.id}, ${member.id}, NOW(), NOW() + INTERVAL '2 minutes');`);
 		});
 	}
 	catch (error) {
