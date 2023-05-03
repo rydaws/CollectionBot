@@ -96,7 +96,7 @@ async function questStatus(interaction) {
 	const experienceToGive = Math.floor(Math.random() * (150 - 50 + 1) + 50);
 
 	if (isQuestActive === 'Ended') {
-		team.forEach((monster) => gainExperience(interaction, monster.id, monster.level, monster.xp, experienceToGive));
+		team.rows.forEach((monster) => gainExperience(interaction, monster.id, monster.level, monster.xp, experienceToGive));
 		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed('Adding XP'))] });
 
 	}
