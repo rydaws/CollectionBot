@@ -118,6 +118,7 @@ async function questStatus(interaction) {
 		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`You have a quest active that has ${Math.round(10 * isQuestActive) / 10} hours left.`))] });
 
 	}
+	return true;
 }
 
 async function questStart(interaction) {
@@ -192,7 +193,6 @@ async function gainExperience(interaction, monster_id, currentLevel, currentExpe
 		client.end();
 	}
 
-	return true;
 	// TODO add 'You earned XXX experience!'
 }
 
