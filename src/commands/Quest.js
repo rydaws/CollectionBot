@@ -38,7 +38,7 @@ module.exports = {
 							WHERE client_id = 100053570027520000;`;
 			deployments = await client.query(query);
 
-			query = `SELECT active FROM box WHERE client_id = ${user.id} AND active = true;`;
+			query = `SELECT * FROM box WHERE client_id = ${user.id} AND active = true;`;
 			team = await client.query(query);
 
 		}
