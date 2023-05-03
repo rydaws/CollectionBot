@@ -191,6 +191,8 @@ async function gainExperience(interaction, monster_id, currentLevel, currentExpe
 
 		client.end();
 	}
+
+	return true;
 	// TODO add 'You earned XXX experience!'
 }
 
