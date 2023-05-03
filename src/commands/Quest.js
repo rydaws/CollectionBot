@@ -54,6 +54,7 @@ module.exports = {
 
 		let ended = false;
 		col = [];
+		console.log('Col length after wipe ', col.length);
 		const teamSize = Object.keys(team.rows).length;
 
 		if (teamSize === 0) {
@@ -78,7 +79,7 @@ module.exports = {
 			ended = await questStatus(interaction);
 
 			if (ended) {
-				await interaction.reply({ embeds: [await createEmbed()] });
+
 
 				try {
 
@@ -89,8 +90,9 @@ module.exports = {
 				catch (error) {
 					console.log('delete up error');
 				}
-
-
+				// TODO DEBUG REMOVE
+				console.log('Col length before calling embed ', col.length);
+				await interaction.reply({ embeds: [await createEmbed()] });
 			}
 
 			break;
@@ -177,6 +179,7 @@ async function levelUp(interaction, monster_id, monster_name, currentLevel) {
 	}
 
 	col.push(`⏫ ${monster_name} has leveled up to \`${currentLevel}\`!`);
+	console.log('Col length after levelUp push ', col.length);
 
 	client.end();
 
@@ -203,6 +206,7 @@ async function gainExperience(interaction, monster_id, monster_name, currentLeve
 		}
 
 		col.push(`🔼 ${monster_name} has gained \`${amount}\` XP!`);
+		console.log('Col length after XP push ', col.length);
 
 		client.end();
 	}
