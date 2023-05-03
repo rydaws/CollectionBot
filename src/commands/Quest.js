@@ -113,7 +113,7 @@ async function questStart(interaction, teamSize) {
 	try {
 		for (let i = 0; i < teamSize; i++) {
 			await client.query(`INSERT INTO deployments (client_id, id, start_time, end_time)
-						VALUES (${user.id}, ${team.rows[i]}, NOW() + INTERVAL '2 minutes');`);
+						VALUES (${user.id}, ${team.rows[i].id}, NOW() + INTERVAL '2 minutes');`);
 		}
 	}
 	catch (error) {
