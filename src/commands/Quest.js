@@ -119,11 +119,13 @@ async function questStatus(interaction) {
 	const experienceToGive = Math.floor(Math.random() * (150 - 50 + 1) + 50);
 
 	if (isQuestActive === 'Ended') {
-		await team.rows.forEach((monster) => gainExperience(interaction, monster.id, monster.display_name, monster.level, monster.xp, experienceToGive));
+		await team.rows.forEach((monster) => gainExperience(interaction, monster.id, monster.display_name, monster.level, monster.xp, experienceToGive).then(async () => {
+			// TODO DEBUG REMOVE
+			console.log('Col length before calling embed ', col.length);
+			await interaction.reply({ embeds: [createEmbed()] });
 
-		// TODO DEBUG REMOVE
-		console.log('Col length before calling embed ', col.length);
-		await interaction.reply({ embeds: [await createEmbed()] });
+		}));
+
 
 		return true;
 	}
