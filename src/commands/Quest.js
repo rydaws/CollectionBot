@@ -217,7 +217,7 @@ function calculateExperienceRequired(currentLevel) {
 	return currentLevel * currentLevel * 100;
 }
 
-async function createEmbed() {
+function createEmbed() {
 
 	const embed = new EmbedBuilder()
 		.setColor(0x0099FF)
