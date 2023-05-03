@@ -75,11 +75,11 @@ module.exports = {
 
 				return;
 			}
-
+			console.log('Ended before func call', ended);
 			ended = await questStatus(interaction);
+			console.log('Ended before if', ended);
 
 			if (ended) {
-
 
 				try {
 
