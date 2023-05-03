@@ -7,6 +7,8 @@ const { Commands } = require('../CommandList');
 let user;
 let deployments;
 let team;
+let col = [];
+const QUEST_LENGTH = '2 minutes';
 
 // Incoming SlashCommand
 module.exports = {
@@ -38,7 +40,12 @@ module.exports = {
 							WHERE client_id = 100053570027520000;`;
 			deployments = await client.query(query);
 
-			query = `SELECT * FROM box WHERE client_id = ${user.id} AND active = true;`;
+			query = `SELECT box.id, box.level, box.active, box.xp, monsters.display_name 
+						FROM box 
+						INNER JOIN monsters 
+						ON box.id = monsters.id 
+						WHERE client_id = ${user.id}
+						AND active = true;`;
 			team = await client.query(query);
 
 		}
@@ -46,6 +53,8 @@ module.exports = {
 			console.log('quest SQL error');
 		}
 
+		let ended = false;
+		col = [];
 		const teamSize = Object.keys(team.rows).length;
 
 		if (teamSize === 0) {
@@ -53,8 +62,6 @@ module.exports = {
 			console.log(`[Quest | ERROR] - ${user.username}'s team is empty, could not access quest data`);
 			return;
 		}
-
-		let ended = false;
 
 		const chosenSubcommand = interaction.options.getSubcommand();
 
@@ -72,6 +79,8 @@ module.exports = {
 			ended = await questStatus(interaction);
 
 			if (ended) {
+				await interaction.reply({ embeds: [createEmbed()] });
+
 				try {
 
 					// Delete record from this deployment
@@ -111,7 +120,7 @@ async function questStatus(interaction) {
 	const experienceToGive = Math.floor(Math.random() * (150 - 50 + 1) + 50);
 
 	if (isQuestActive === 'Ended') {
-		team.rows.forEach((monster) => gainExperience(interaction, monster.id, monster.level, monster.xp, experienceToGive));
+		team.rows.forEach((monster) => gainExperience(interaction, monster.id, monster.display_name, monster.level, monster.xp, experienceToGive));
 
 	}
 	else {
@@ -130,7 +139,7 @@ async function questStart(interaction) {
 	try {
 		team.rows.forEach((member) => {
 			client.query(`INSERT INTO deployments (client_id, id, start_time, end_time)
-						VALUES (${user.id}, ${member.id}, NOW(), NOW() + INTERVAL '2 minutes');`);
+						VALUES (${user.id}, ${member.id}, NOW(), NOW() + INTERVAL ${QUEST_LENGTH});`);
 		});
 	}
 	catch (error) {
@@ -147,13 +156,14 @@ async function questStart(interaction) {
 
 }
 
-async function levelUp(interaction, monster_id, currentLevel) {
+async function levelUp(interaction, monster_id, monster_name, currentLevel) {
 
 	currentLevel++;
 	const experienceRequired = calculateExperienceRequired(currentLevel);
 	// await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Congratulations! Your Monster has reached level ${currentLevel}. They need ${experienceRequired} experience to reach the next level.`))] });
 
 	console.log(`Congratulations! Your Monster has reached level ${currentLevel}. They need ${experienceRequired} experience to reach the next level.`);
+
 	const client = new Client(con);
 	await client.connect();
 
@@ -167,11 +177,13 @@ async function levelUp(interaction, monster_id, currentLevel) {
 		console.log('level up error');
 	}
 
+	col.push(`⏫ ${monster_name} has leveled up to \`${currentLevel}\`!`);
+
 	client.end();
 
 }
 
-async function gainExperience(interaction, monster_id, currentLevel, currentExperience, amount) {
+async function gainExperience(interaction, monster_id, monster_name, currentLevel, currentExperience, amount) {
 	currentExperience += amount;
 	const experienceRequired = calculateExperienceRequired(currentLevel);
 	if (currentExperience >= experienceRequired) {
@@ -185,17 +197,32 @@ async function gainExperience(interaction, monster_id, currentLevel, currentExpe
 		try {
 			const query = `UPDATE box SET xp = ${currentExperience} WHERE client_id = ${user.id} AND id = ${monster_id} AND active = true;;`;
 			await client.query(query);
+
 		}
 		catch (error) {
 			console.log('gain experience error');
 		}
 
+		col.push(`🔼 ${monster_name} has gained \`${amount}\` XP!`);
+
 		client.end();
 	}
 
-	// TODO add 'You earned XXX experience!'
 }
 
 function calculateExperienceRequired(currentLevel) {
 	return currentLevel * currentLevel * 100;
+}
+
+function createEmbed() {
+
+	const embed = new EmbedBuilder()
+		.setColor(0x0099FF)
+		.setTitle('Quest results')
+		.setAuthor({ name: `${user.username}'s team`, iconURL: user.avatarURL() })
+		.setTimestamp();
+
+	embed.addFields({ name: ' ', value: `${col.join('')}`, inline: true });
+
+	return embed;
 }

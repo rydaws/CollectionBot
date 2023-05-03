@@ -51,7 +51,7 @@ module.exports = {
 		const client = new Client(con);
 		await client.connect();
 
-		const getDB = `SELECT box.client_id, box.id, box.level, box.active, monsters.display_name from box INNER JOIN monsters ON box.id = monsters.id WHERE client_id = ${user.id} AND active = true ORDER BY box.id;`;
+		const getDB = `SELECT box.client_id, box.id, box.level, box.xp, box.active, monsters.display_name from box INNER JOIN monsters ON box.id = monsters.id WHERE client_id = ${user.id} AND active = true ORDER BY box.id;`;
 
 		try {
 			const query = `SELECT box.id, monsters.display_name FROM box INNER JOIN monsters ON box.id = monsters.id WHERE client_id = ${user.id};`;
@@ -180,7 +180,7 @@ async function createEmbed() {
 	const col = [];
 
 	box.rows.forEach((member) => {
-		col.push(`✅ \`${member.id}\` ${member.display_name} Lv: \`${member.level}\`\n`);
+		col.push(`✅ \`${member.id}\` ${member.display_name} Lv: \`${member.level}\` XP: ${member.xp}\n`);
 	});
 
 	size = Object.keys(box.rows).length;
