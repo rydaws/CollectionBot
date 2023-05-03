@@ -32,7 +32,7 @@ module.exports = {
 			let query = `SELECT timeoutid, start_time, end_time,
 							  CASE 
 								WHEN end_time < NOW() THEN 'Ended' 
-								ELSE CONCAT(EXTRACT(epoch FROM (end_time - NOW()))/3600, ' hours left')
+								ELSE CONCAT(EXTRACT(epoch FROM (end_time - NOW()))/3600)
 							  END AS status
 							FROM deployments
 							WHERE client_id = 100053570027520000;`;
@@ -91,7 +91,7 @@ async function questStatus(interaction) {
 
 	}
 	else {
-		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`You have a quest active that has ${Math.round(10 * isQuestActive) / 10}.`))] });
+		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`You have a quest active that has ${Math.round(10 * isQuestActive) / 10} hours left.`))] });
 
 	}
 }
