@@ -78,7 +78,7 @@ module.exports = {
 			ended = await questStatus(interaction);
 
 			if (ended) {
-				await interaction.reply({ embeds: [createEmbed()] });
+				await interaction.reply({ embeds: [await createEmbed()] });
 
 				try {
 
@@ -213,7 +213,7 @@ function calculateExperienceRequired(currentLevel) {
 	return currentLevel * currentLevel * 100;
 }
 
-function createEmbed() {
+async function createEmbed() {
 
 	const embed = new EmbedBuilder()
 		.setColor(0x0099FF)
