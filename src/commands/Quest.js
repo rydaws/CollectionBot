@@ -186,7 +186,7 @@ async function gainExperience(interaction, monster_id, monster_name, currentLeve
 	currentExperience += amount;
 	const experienceRequired = calculateExperienceRequired(currentLevel);
 	if (currentExperience >= experienceRequired) {
-		await levelUp(interaction, monster_id, currentLevel);
+		await levelUp(interaction, monster_id, monster_name, currentLevel);
 	}
 	else {
 
