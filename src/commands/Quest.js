@@ -54,6 +54,7 @@ module.exports = {
 			return;
 		}
 
+		let ended = false;
 
 		const chosenSubcommand = interaction.options.getSubcommand();
 
@@ -68,7 +69,21 @@ module.exports = {
 				return;
 			}
 
-			await questStatus(interaction);
+			ended = await questStatus(interaction);
+
+			if (ended) {
+				try {
+
+					// Delete record from this deployment
+					const query = `DELETE FROM deployments WHERE client_id = ${user.id};`;
+					await client.query(query);
+				}
+				catch (error) {
+					console.log('delete up error');
+				}
+
+
+			}
 
 			break;
 
@@ -84,6 +99,7 @@ module.exports = {
 			break;
 
 		}
+		client.end();
 
 	},
 };
@@ -96,7 +112,6 @@ async function questStatus(interaction) {
 
 	if (isQuestActive === 'Ended') {
 		team.rows.forEach((monster) => gainExperience(interaction, monster.id, monster.level, monster.xp, experienceToGive));
-
 
 	}
 	else {
@@ -135,19 +150,17 @@ async function levelUp(interaction, monster_id, currentLevel) {
 
 	currentLevel++;
 	const experienceRequired = calculateExperienceRequired(currentLevel);
-	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Congratulations! Your Monster has reached level ${currentLevel}. They need ${experienceRequired} experience to reach the next level.`))] });
+	// await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Congratulations! Your Monster has reached level ${currentLevel}. They need ${experienceRequired} experience to reach the next level.`))] });
 
+	console.log(`Congratulations! Your Monster has reached level ${currentLevel}. They need ${experienceRequired} experience to reach the next level.`);
 	const client = new Client(con);
 	await client.connect();
 
 	try {
 		// Update monster level and reset experience points
-		let query = `UPDATE box SET level = ${currentLevel} AND SET xp = 0 WHERE id = ${monster_id} AND active = true;`;
+		const query = `UPDATE box SET level = ${currentLevel} AND SET xp = 0 WHERE id = ${monster_id} AND active = true;`;
 		await client.query(query);
 
-		// Delete record from this deployment
-		query = `DELETE FROM deployments WHERE client_id = ${user.id};`;
-		await client.query(query);
 	}
 	catch (error) {
 		console.log('level up error');
