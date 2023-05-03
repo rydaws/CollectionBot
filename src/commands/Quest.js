@@ -29,7 +29,13 @@ module.exports = {
 		await client.connect();
 
 		try {
-			let query = `SELECT * FROM deployments WHERE client_id = ${user.id};`;
+			let query = `SELECT timeoutid, start_time, end_time,
+							  CASE 
+								WHEN end_time < NOW() THEN 'Ended' 
+								ELSE CONCAT(EXTRACT(epoch FROM (end_time - NOW()))/3600, ' hours left')
+							  END AS status
+							FROM deployments
+							WHERE client_id = 100053570027520000;`;
 			deployments = await client.query(query);
 
 			query = `SELECT active FROM box WHERE client_id = ${user.id} AND active = true;`;
@@ -67,6 +73,8 @@ module.exports = {
 			break;
 
 		case 'start':
+
+			await questStart(interaction);
 			break;
 
 		}
@@ -75,9 +83,23 @@ module.exports = {
 };
 
 async function questStatus(interaction) {
-	const startTime = deployments.rows[0].start_at;
-	const endTime = deployments.rows[0].end_at;
+	const isQuestActive = deployments.rows[0].status;
 
-	
+	if (isQuestActive === 'Ended') {
+		addXP();
+		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed('TODO Adding XP'))] });
 
+	}
+	else {
+		await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`You have a quest active that has ${Math.round(10 * isQuestActive) / 10}.`))] });
+
+	}
+}
+
+async function questStart(interaction) {
+	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed('TODO Start quest!'))] });
+
+}
+function addXP() {
+	console.log('adding xp...');
 }
