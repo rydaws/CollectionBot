@@ -158,7 +158,7 @@ async function levelUp(interaction, monster_id, currentLevel) {
 
 	try {
 		// Update monster level and reset experience points
-		const query = `UPDATE box SET level = ${currentLevel} AND SET xp = 0 WHERE id = ${monster_id} AND active = true;`;
+		const query = `UPDATE box SET level = ${currentLevel} AND SET xp = 0 WHERE client_id = ${user.id} AND id = ${monster_id} AND active = true;`;
 		await client.query(query);
 
 	}
