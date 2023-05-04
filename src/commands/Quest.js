@@ -8,6 +8,7 @@ let user;
 let deployments;
 let team;
 let col = [];
+const QUEST_LENGTH = '2 minutes';
 
 // Incoming SlashCommand
 module.exports = {
@@ -49,12 +50,11 @@ module.exports = {
 
 		}
 		catch (error) {
-			console.log('quest SQL error');
+			console.log(`[Quest | ERROR] - Could not gather box & deployment info from database for ${user.username}`);
 		}
 
 		let ended = false;
 		col = [];
-		console.log('Col length after wipe ', col.length);
 		const teamSize = Object.keys(team.rows).length;
 
 		if (teamSize === 0) {
@@ -75,9 +75,8 @@ module.exports = {
 
 				return;
 			}
-			console.log('Ended before func call', ended);
-			ended = await questStatus(interaction);
-			console.log('Ended before if', ended);
+
+			ended = questStatus(interaction);
 
 			if (ended) {
 
@@ -88,11 +87,9 @@ module.exports = {
 					await client.query(query);
 				}
 				catch (error) {
-					console.log('delete up error');
+					console.log(`[Quest | ERROR] - Could not remove deployment for ${user.username}`);
 				}
 
-				// TODO DEBUG REMOVE
-				console.log('Col length before calling embed ', col.length);
 				await interaction.reply({ embeds: [createEmbed()] });
 
 			}
@@ -146,18 +143,16 @@ async function questStart(interaction) {
 	try {
 		team.rows.forEach((member) => {
 			client.query(`INSERT INTO deployments (client_id, id, start_time, end_time)
-						VALUES (${user.id}, ${member.id}, NOW(), NOW() + INTERVAL '2 minutes');`);
+						VALUES (${user.id}, ${member.id}, NOW(), NOW() + INTERVAL '${QUEST_LENGTH}');`);
 		});
 	}
 	catch (error) {
-		console.log('start error');
+		console.log(`[Quest | ERROR] - Could not create deployment for ${user.username}`);
 		return;
 	}
 
-	// TODO add 'Quest started!'
-
-	console.log('quest successfully started');
-	await interaction.reply({ embeds: [new EmbedBuilder(textEmbed('started quest'))] });
+	console.log(`[Quest] - Quest started for user ${user.username} which will end in ${QUEST_LENGTH}`);
+	await interaction.reply({ embeds: [createStartEmbed()] });
 
 	client.end();
 
@@ -167,14 +162,12 @@ function levelUp(monster_id, monster_name, currentLevel) {
 
 	currentLevel++;
 	const experienceRequired = calculateExperienceRequired(currentLevel);
-	// await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`Congratulations! Your Monster has reached level ${currentLevel}. They need ${experienceRequired} experience to reach the next level.`))] });
 
-	console.log(`Congratulations! Your Monster has reached level ${currentLevel}. They need ${experienceRequired} experience to reach the next level.`);
+	console.log(`[Quest] - ${monster_name} increased to level ${currentLevel} for ${user.username}. They need ${experienceRequired} to level up`);
 
-	col.push(`⏫ **${monster_name}** has leveled up to \`${currentLevel}\`!\n`);
-	console.log('Col length after levelUp push ', col.length);
+	col.push(`⏫ **${monster_name}** has leveled up to Lv \`${currentLevel}\`!\n`);
 
-	updateDB('addExperience', monster_id, currentLevel).then(() => console.log('DB level up success'));
+	updateDB('addExperience', monster_id, currentLevel).then(() => console.log(`[Quest] - DB level up success for ${monster_name} for ${user.username}`));
 
 }
 
@@ -182,14 +175,13 @@ function gainExperience(monster_id, monster_name, currentLevel, currentExperienc
 	currentExperience += amount;
 	const experienceRequired = calculateExperienceRequired(currentLevel);
 	if (currentExperience >= experienceRequired) {
-		levelUp(monster_id, monster_name, currentLevel);
+		levelUp(monster_id, monster_name, currentLevel, experienceRequired);
 	}
 	else {
 
 		col.push(`🔼 **${monster_name}** has gained \`${amount}\` XP!\n`);
-		console.log('Col length after XP push ', col.length);
 
-		updateDB('addExperience', monster_id, currentExperience).then(() => console.log('DB XP Up success'));
+		updateDB('addExperience', monster_id, currentExperience).then(() => console.log(`[Quest] - DB experience increase success for ${monster_name} for ${user.username}`));
 	}
 
 }
@@ -211,7 +203,17 @@ function createEmbed() {
 	return embed;
 }
 
-async function updateDB(command, monster_id, updatedValue) {
+function createStartEmbed() {
+
+	return new EmbedBuilder()
+		.setColor(0x0099FF)
+		.setTitle('Quest started!')
+		.setAuthor({ name: `${user.username}'s quest`, iconURL: user.avatarURL() })
+		.setDescription(`Your quest will be done in ${QUEST_LENGTH}, check it's status with ${Commands.quest[0]}`)
+		.setTimestamp();
+}
+
+async function updateDB(command, monster_id, updatedValue, experienceRequired) {
 
 	const client = new Client(con);
 	await client.connect();
@@ -221,23 +223,24 @@ async function updateDB(command, monster_id, updatedValue) {
 	case 'addExperience':
 
 		try {
-			query = `UPDATE box SET xp = ${updatedValue} WHERE client_id = ${user.id} AND id = ${monster_id} AND active = true;`;
+			query = `UPDATE box SET xp = ${updatedValue}, xp_required = ${experienceRequired} WHERE client_id = ${user.id} AND id = ${monster_id} AND active = true;`;
 			await client.query(query);
 		}
 		catch (error) {
-			console.log('gain experience error');
+			console.log(`[Quest | ERROR] - Could not add experience for ${user.username}`);
 		}
 
 		break;
+
 	case 'levelUp':
 		try {
 			// Update monster level and reset experience points
-			query = `UPDATE box SET level = ${updatedValue}, xp = 0 WHERE client_id = ${user.id} AND id = ${monster_id} AND active = true;`;
+			query = `UPDATE box SET level = ${updatedValue}, xp = 0, xp_required = ${experienceRequired} WHERE client_id = ${user.id} AND id = ${monster_id} AND active = true;`;
 			await client.query(query);
 
 		}
 		catch (error) {
-			console.log('level up error');
+			console.log(`[Quest | ERROR] - Could not update level for ${user.username}`);
 		}
 		break;
 	}
