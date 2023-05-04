@@ -181,7 +181,7 @@ function gainExperience(monster_id, monster_name, currentLevel, currentExperienc
 
 		col.push(`🔼 **${monster_name}** has gained \`${amount}\` XP!\n`);
 
-		updateDB('addExperience', monster_id, currentExperience).then(() => console.log(`[Quest] - DB experience increase success for ${monster_name} for ${user.username}`));
+		updateDB('addExperience', monster_id, currentExperience, experienceRequired).then(() => console.log(`[Quest] - DB experience increase success for ${monster_name} for ${user.username}`));
 	}
 
 }
