@@ -171,7 +171,7 @@ function levelUp(monster_id, monster_name, currentLevel) {
 
 	console.log(`Congratulations! Your Monster has reached level ${currentLevel}. They need ${experienceRequired} experience to reach the next level.`);
 
-	col.push(`⏫ ${monster_name} has leveled up to \`${currentLevel}\`!`);
+	col.push(`⏫ **${monster_name}** has leveled up to \`${currentLevel}\`!\n`);
 	console.log('Col length after levelUp push ', col.length);
 
 	updateDB('addExperience', monster_id, currentLevel).then(() => console.log('DB level up success'));
@@ -186,7 +186,7 @@ function gainExperience(monster_id, monster_name, currentLevel, currentExperienc
 	}
 	else {
 
-		col.push(`🔼 ${monster_name} has gained \`${amount}\` XP!`);
+		col.push(`🔼 **${monster_name}** has gained \`${amount}\` XP!\n`);
 		console.log('Col length after XP push ', col.length);
 
 		updateDB('addExperience', monster_id, currentExperience).then(() => console.log('DB XP Up success'));
