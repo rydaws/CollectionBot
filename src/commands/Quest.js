@@ -167,7 +167,7 @@ function levelUp(monster_id, monster_name, currentLevel) {
 
 	col.push(`⏫ **${monster_name}** has leveled up to Lv \`${currentLevel}\`!\n`);
 
-	updateDB('addExperience', monster_id, currentLevel).then(() => console.log(`[Quest] - DB level up success for ${monster_name} for ${user.username}`));
+	updateDB('addExperience', monster_id, currentLevel, experienceRequired).then(() => console.log(`[Quest] - DB level up success for ${monster_name} for ${user.username}`));
 
 }
 
