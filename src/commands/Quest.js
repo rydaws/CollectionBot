@@ -32,12 +32,17 @@ module.exports = {
 
 		try {
 			let query = `SELECT start_time, end_time,
-							  CASE 
-								WHEN end_time < NOW() THEN 'Ended' 
-								ELSE CONCAT(EXTRACT(epoch FROM (end_time - NOW()))/3600)
-							  END AS status
-							FROM deployments
-							WHERE client_id = ${user.id};`;
+						  CASE 
+							WHEN end_time < NOW() THEN 'Ended' 
+							ELSE CONCAT(
+							  EXTRACT(hour FROM time_left), ' hours, ',
+							  EXTRACT(minute FROM time_left), ' minutes left'
+							)
+						  END AS status
+						FROM (
+						  SELECT start_time, end_time, end_time - NOW() AS time_left
+						  FROM deployments
+						) AS subquery;`;
 			deployments = await client.query(query);
 
 			query = `SELECT box.id, box.level, box.active, box.xp, monsters.display_name 
