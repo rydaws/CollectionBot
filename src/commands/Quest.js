@@ -100,7 +100,7 @@ module.exports = {
 
 			}
 			else {
-				await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`You have a quest active that has ${Math.round(10 * deployments.rows[0].status) / 10} hours left.`))] });
+				await interaction.reply({ embeds: [new EmbedBuilder(textEmbed(`You have a quest active that has ${deployments.rows[0].status}`))] });
 			}
 
 			break;
