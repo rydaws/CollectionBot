@@ -42,6 +42,7 @@ module.exports = {
 						FROM (
 						  SELECT start_time, end_time, end_time - NOW() AS time_left
 						  FROM deployments
+						  WHERE client_id = ${user.id}
 						) AS subquery;`;
 			deployments = await client.query(query);
 
