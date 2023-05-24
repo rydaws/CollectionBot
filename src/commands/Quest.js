@@ -125,6 +125,7 @@ module.exports = {
 function questStatus() {
 	const isQuestActive = deployments.rows[0].status;
 
+
 	// Random XP between 50 and 150 ((Max - Min + 1) + min)
 	const experienceToGive = Math.floor(Math.random() * (150 - 50 + 1) + 50);
 
