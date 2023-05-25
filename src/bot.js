@@ -2,7 +2,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 // Require the necessary discord.js classes
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
-const { token } = require('./config.json');
+const dotenv = require('dotenv');
 const { deploy } = require('./deploy-commands');
 
 // Create a new client instance
@@ -11,6 +11,7 @@ const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
 // Deploys commands
+dotenv.config();
 
 deploy();
 
@@ -78,4 +79,4 @@ for (const file of buttonFiles) {
 
 // client.ComponentListener();
 // Log in to Discord with your client's token
-client.login(token);
+client.login(process.env.DISCORD_TOKEN);

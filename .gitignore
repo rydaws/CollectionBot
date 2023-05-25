@@ -3,7 +3,6 @@ node_modules
 
 #Ignore files related to API keys
 src/.env
-src/config.json
 
 #Ignore lint files
 src/.eslintrc.json
