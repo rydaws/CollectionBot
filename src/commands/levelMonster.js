@@ -47,7 +47,7 @@ module.exports = {
 		}
 
 		// Closes SQL connection
-		client.end();
+		client.destroy();
 
 	},
 };

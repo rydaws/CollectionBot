@@ -112,7 +112,7 @@ module.exports = {
 			await interaction.reply({ embeds: [await createEmbed()] });
 		}
 
-		client.end();
+		client.destroy();
 	},
 };
 

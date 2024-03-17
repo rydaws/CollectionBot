@@ -106,7 +106,7 @@ module.exports = {
 		}
 
 		// Close SQL connection
-		client.end();
+		client.destroy();
 
 	},
 

@@ -52,7 +52,7 @@ module.exports = {
 		}
 
 		// Close SQL connection
-		await client.end();
+		await client.destroy();
 	},
 };
 

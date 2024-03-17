@@ -28,6 +28,7 @@ module.exports = {
 		catch (e) {
 			console.log(`[Backpack | ERROR] Could not fetch Backpack of user ${user.username}`);
 		}
+		client.destroy();
 	},
 };
 
