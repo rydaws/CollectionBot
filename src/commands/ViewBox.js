@@ -55,7 +55,7 @@ module.exports = {
 		}
 
 		// Closes SQL connection
-		client.destroy();
+		await client.end()
 
 	},
 	/**

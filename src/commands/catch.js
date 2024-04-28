@@ -107,7 +107,7 @@ module.exports = {
 		}
 
 		// Close SQL connection
-		client.destroy();
+		await client.end()
 
 	},
 
@@ -216,7 +216,7 @@ async function catchEvent(interaction) {
 	}
 
 	// Close SQL connection
-	client.destroy();
+	await client.end()
 
 }
 

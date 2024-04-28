@@ -117,7 +117,7 @@ module.exports = {
 			break;
 
 		}
-		client.destroy();
+		await client.end()
 
 	},
 };
@@ -161,7 +161,7 @@ async function questStart(interaction) {
 	console.log(`[Quest] - Quest started for user ${user.username} which will end in ${QUEST_LENGTH}`);
 	await interaction.reply({ embeds: [createStartEmbed()] });
 
-	client.destroy();
+	await client.end()
 
 }
 
@@ -252,6 +252,6 @@ async function updateDB(command, monster_id, updatedValue, experienceRequired) {
 		break;
 	}
 
-	client.destroy();
+	await client.end()
 
 }
