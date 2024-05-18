@@ -2,15 +2,19 @@ import { readdirSync } from "node:fs";
 import { join } from "node:path";
 // Require the necessary discord.js classes
 import { Client, Collection, GatewayIntentBits } from "discord.js";
+const { Guilds, MessageContent, GuildMessages, GuildMembers } = GatewayIntentBits
+
 import { config } from "dotenv";
 import path from "node:path";
 const { deploy } = require("./deploy-commands")
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+// const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({intents:[Guilds, MessageContent, GuildMessages, GuildMembers]})
+
 const eventsPath = path.join(__dirname, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter((file: any) => file.endsWith('.js'));
 
-// Deploys commands
+// Deploys slashCommands
 config();
 
 deploy();
@@ -26,9 +30,8 @@ for (const file of eventFiles) {
 	}
 }
 
-client.commands = new Collection();
 
-// Fetches regular commands
+// Fetches regular slashCommands
 const commandsPath = join(__dirname, "commands");
 const commandFiles = readdirSync(commandsPath).filter(file => file.endsWith(".js") || file.endsWith(".ts"));
 
@@ -44,8 +47,8 @@ for (const file of commandFiles) {
 	}
 }
 
-// Fetches Staff commands
-const staffCommandsPath = join(__dirname, "commands/staff");
+// Fetches Staff slashCommands
+const staffCommandsPath = join(__dirname, "slashCommands/staff");
 const staffCommandFiles = readdirSync(staffCommandsPath).filter(file => file.endsWith(".js") || file.endsWith(".ts"));
 
 for (const file of staffCommandFiles) {
@@ -60,7 +63,6 @@ for (const file of staffCommandFiles) {
 	}
 }
 
-client.buttons = new Collection();
 
 const buttonsPath = join(__dirname, "./components/buttons");
 const buttonFiles = readdirSync(buttonsPath).filter(file => file.endsWith(".js") || file.endsWith(".ts"));

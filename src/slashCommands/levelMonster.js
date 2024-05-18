@@ -7,7 +7,7 @@ const { errorEmbed, textEmbed } = require('../util/EmbedUtil');
 let res;
 let level;
 
-// TODO move to staff commands
+// TODO move to staff slashCommands
 
 // Incoming SlashCommand
 module.exports = {

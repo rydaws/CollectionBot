@@ -1,4 +1,4 @@
-const { catchAttempt } = require('../../commands/catch');
+const { catchAttempt } = require('../../slashCommands/catch');
 const { beartrap } = require('../../items/Traps');
 module.exports = {
 	data: {

@@ -3,9 +3,9 @@ const dotenv = require('dotenv');
 const fs = require('node:fs');
 
 const commands: string[] = [];
-// Grab all the command files from the commands directory you created earlier
-const commandFiles = fs.readdirSync('./commands').filter((file: any) => file.endsWith('.js'));
-const staffCommandFiles = fs.readdirSync('./commands/staff').filter((file: any) => file.endsWith('.js'));
+// Grab all the command files from the slashCommands directory you created earlier
+const commandFiles = fs.readdirSync('./slashCommands').filter((file: any) => file.endsWith('.js'));
+const staffCommandFiles = fs.readdirSync('./slashCommands/staff').filter((file: any) => file.endsWith('.js'));
 
 dotenv.config();
 
@@ -26,12 +26,12 @@ module.exports = {
 		// Construct and prepare an instance of the REST module
 		const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
-		// and deploy your commands!
+		// and deploy your slashCommands!
 		(async () => {
 			try {
 				console.log(`Started refreshing ${commands.length} application (/) commands.`);
 
-				// The put method is used to fully refresh all commands in the guild with the current set
+				// The put method is used to fully refresh all slashCommands in the guild with the current set
 				const data = await rest.put(
 					Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
 					{ body: commands },

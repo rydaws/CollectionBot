@@ -1,4 +1,4 @@
-const { nextPage } = require('../../commands/ViewBox');
+const { nextPage } = require('../../slashCommands/ViewBox');
 module.exports = {
 	data: {
 		name: 'next_page',

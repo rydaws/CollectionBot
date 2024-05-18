@@ -1,15 +1,20 @@
-// Require the necessary discord.js classes
-import { Client, Events, GatewayIntentBits } from "discord.js";
+import { Client, GatewayIntentBits, Collection, PermissionFlagsBits,} from "discord.js";
+const { Guilds, MessageContent, GuildMessages, GuildMembers } = GatewayIntentBits
+const client = new Client({intents:[Guilds, MessageContent, GuildMessages, GuildMembers]})
+import { Command, SlashCommand } from "./types";
+import { config } from "dotenv";
+import { readdirSync } from "fs";
+import { join } from "path";
+config()
 
-// Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+client.slashCommands = new Collection<string, SlashCommand>()
+client.commands = new Collection<string, Command>()
+client.cooldowns = new Collection<string, number>()
 
-// When the client is ready, run this code (only once).
-// The distinction between `client: Client<boolean>` and `readyClient: Client<true>` is important for TypeScript developers.
-// It makes some properties non-nullable.
-client.once(Events.ClientReady, (readyClient: any) => {
-  console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-});
+const handlersDir = join(__dirname, "./handlers")
+readdirSync(handlersDir).forEach(handler => {
+  if (!handler.endsWith(".js")) return;
+  require(`${handlersDir}/${handler}`)(client)
+})
 
-// Log in to Discord with your client's token
-client.login(process.env.DISCORD_TOKEN);
+client.login(process.env.DISCORD_TOKEN)

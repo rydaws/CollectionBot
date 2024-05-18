@@ -1,4 +1,4 @@
-const { lastPage } = require('../../commands/ViewBox');
+const { lastPage } = require('../../slashCommands/ViewBox');
 module.exports = {
 	data: {
 		name: 'last_page',
