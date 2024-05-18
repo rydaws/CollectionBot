@@ -2,10 +2,10 @@ const { REST, Routes } = require('discord.js');
 const dotenv = require('dotenv');
 const fs = require('node:fs');
 
-const commands = [];
+const commands: string[] = [];
 // Grab all the command files from the commands directory you created earlier
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
-const staffCommandFiles = fs.readdirSync('./commands/staff').filter(file => file.endsWith('.js'));
+const commandFiles = fs.readdirSync('./commands').filter((file: any) => file.endsWith('.js'));
+const staffCommandFiles = fs.readdirSync('./commands/staff').filter((file: any) => file.endsWith('.js'));
 
 dotenv.config();
 

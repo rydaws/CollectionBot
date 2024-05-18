@@ -1,4 +1,4 @@
-const { Client } = require('pg');
+import { Client } from "pg";
 
 // Use this when making a query
 const client = new Client({
@@ -6,7 +6,7 @@ const client = new Client({
 	host: process.env.PGHOST,
 	database: process.env.PGDATABASE,
 	password: process.env.PGPASSWORD,
-	port: process.env.PGPORT,
+	port: process.env.PGPORT
 });
-module.exports = client;
+export default client;
 
