@@ -5,10 +5,13 @@ node_modules
 .env
 
 #Ignore lint files
-src/.eslintrc.json
+eslint.config.js
 
 #Ignore .idea files
 .idea
 
 #Ignore log files
 *.log
+
+#Ignore build files
+/build

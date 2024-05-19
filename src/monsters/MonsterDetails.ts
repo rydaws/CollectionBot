@@ -1,11 +1,13 @@
-const monsters = [
+import { MonsterStatistics } from "../lib/types/global";
+
+export const monsters: MonsterStatistics[] = [
 	{ rarity: 'Bronze', catchRate: 70, encounterRate: 50, color: 0xAF6600, shmoinMulti: 1 },
 	{ rarity: 'Silver', catchRate: 40, encounterRate: 30, color: 0xCDCDCD, shmoinMulti: 2 },
 	{ rarity: 'Gold', catchRate: 20, encounterRate: 10, color: 0xFFD500, shmoinMulti: 4 },
 	{ rarity: 'Diamond', catchRate: 5, encounterRate: 3, color: 0x00E3FF, shmoinMulti: 8 },
 ];
 
-function fetchMonsterDetails(rarity) {
+export function fetchMonsterDetails(rarity: string) {
 	rarity = rarity.toString().toLocaleUpperCase();
 
 	switch (rarity) {
@@ -19,8 +21,3 @@ function fetchMonsterDetails(rarity) {
 		return monsters[3];
 	}
 }
-
-module.exports = {
-	fetchMonsterDetails,
-	monsters,
-};

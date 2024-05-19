@@ -1,19 +1,22 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { con } = require('../util/QueryUtil');
-const { Client } = require('pg');
-const { errorEmbed } = require('../util/EmbedUtil');
-const { refreshItems, returnItem } = require('../items/ItemList');
-const { Commands } = require('../CommandList');
-const { refreshTraps } = require('../items/Traps');
-const { refreshAmplifiers } = require('../items/Amplifiers');
+import { EmbedBuilder, Interaction, PermissionFlagsBits, SlashCommandBuilder, User } from "discord.js";
+import con from "../util/QueryUtil";
+import { Client } from "pg";
+import { errorEmbed } from "../util/EmbedUtil";
+import { refreshItems, returnItem } from "../items/ItemList";
+import { Commands } from "../CommandList";
+import { refreshTraps } from "../items/Traps";
+import { refreshAmplifiers } from "../items/Amplifiers";
+import { Amplifier, Trap } from "../lib/types/global";
+import { SlashCommand } from "../types";
+
 
 // Global variables
-let user;
-let shmoins;
+let user: User;
+let shmoins: number;
 
 // Incoming SlashCommand
-module.exports = {
-	data: new SlashCommandBuilder()
+const ViewShop: SlashCommand = {
+	command: new SlashCommandBuilder()
 		.setName('shop')
 		.setDescription('Displays the Shop')
 		.addSubcommand(subcommand =>
@@ -38,13 +41,14 @@ module.exports = {
 				.addIntegerOption(quantity =>
 					quantity.setName('quantity')
 						.setDescription('Quantity of item')
-						.setRequired(true))),
+						.setRequired(true)))
+		.setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
 
-	async execute(interaction) {
+	execute: async (interaction)=> {
 		user = interaction.user;
 
 		// Refreshes item list
-		const itemList = refreshItems();
+		const itemList: any = refreshItems();
 
 		// SQL connection
 		const client = new Client(con);
@@ -56,17 +60,17 @@ module.exports = {
 			shmoins = res.rows[0].shmoins;
 		}
 		catch (error) {
-			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Shop Error! Please contact staff!'))] });
+			await interaction.reply({ embeds: [errorEmbed('Shop Error! Please contact staff!')] });
 		}
 
 		// Subcommand for viewing shop
 		if (interaction.options.getSubcommand() === 'view') {
 			try {
 				// Embed to list all shop items
-				await interaction.reply({ embeds: [createEmbed(itemList)] });
+				await interaction.reply({ embeds: [createEmbed()] });
 			}
 			catch (error) {
-				await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Shop Error! Please contact staff!'))] });
+				await interaction.reply({ embeds: [errorEmbed('Shop Error! Please contact staff!')] });
 			}
 
 		}
@@ -74,11 +78,11 @@ module.exports = {
 		// Subcommand for buying items from the shop
 		if (interaction.options.getSubcommand() === 'buy') {
 			// Gets parameters from command
-			const item_name = interaction.options.getString('item_name');
-			const quantity = interaction.options.getInteger('quantity');
+			const item_name: string = interaction.options.getString('item_name') || 'none';
+			const quantity: number = interaction.options.getInteger('quantity') || 0;
 
 			// Gets item object from the name specified
-			const item = returnItem(item_name);
+			const item: any = returnItem(item_name);
 
 			const price = item.price * quantity;
 
@@ -121,11 +125,11 @@ function createEmbed() {
 
 	const embed = new EmbedBuilder()
 		.setColor(0x0099FF)
-		.setAuthor({ name: 'Shop', iconURL: user.avatarURL() })
+		.setAuthor({ name: 'Shop', iconURL: user.avatarURL()! })
 		.setDescription('**View my wares...**')
 		.setTimestamp();
 
-	// TODO maybe we can filter instead of having this function?
+	// TODO: maybe we can filter instead of having this function?
 	// Refreshes items to filter out disabled ones
 	const trapList = refreshTraps();
 	const amplifierList = refreshAmplifiers();
@@ -165,7 +169,7 @@ function createEmbed() {
  *
  * @returns {EmbedBuilder} - The embed that is returned
  */
-function successPurchase(item, quantity, price) {
+function successPurchase(item: Trap | Amplifier, quantity: number, price: number) {
 
 	return new EmbedBuilder()
 		.setColor(0x32CD32)
@@ -182,7 +186,7 @@ function successPurchase(item, quantity, price) {
  *
  * @returns {EmbedBuilder} - The embed that is returned
  */
-function failPurchase(item, quantity, price) {
+function failPurchase(item: Trap | Amplifier, quantity: number, price: number) {
 
 	return new EmbedBuilder()
 		.setColor(0xFE514E)
@@ -199,7 +203,7 @@ function failPurchase(item, quantity, price) {
  * @param {Object} item - The current item
  * @returns {string} - String of whitespace
  */
-function addWhitespace(item) {
+function addWhitespace(item: Amplifier | Trap) {
 	const max = 30;
 
 	// Length of current items
@@ -215,3 +219,5 @@ function addWhitespace(item) {
 
 	return whitespace;
 }
+
+export default ViewShop

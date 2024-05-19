@@ -1,6 +1,8 @@
-const { EmbedBuilder } = require('discord.js');
-const { fetchMonsterDetails } = require('../monsters/MonsterDetails');
-function monsterEmbed(user, res) {
+import { EmbedBuilder, User } from "discord.js";
+// @ts-ignore
+import { fetchMonsterDetails } from "../monsters/MonsterDetails";
+
+export function monsterEmbed(user: User, res: any) {
 	console.log('[DisplayMonster] Starts embed build');
 	const name = res.rows[0].display_name;
 	const className = res.rows[0].class;
@@ -9,9 +11,9 @@ function monsterEmbed(user, res) {
 	const img = res.rows[0].img;
 
 	return new EmbedBuilder()
-		.setColor(fetchMonsterDetails(rarity).color)
+		.setColor(fetchMonsterDetails(rarity)?.color!)
 		.setTitle('Monster')
-		.setAuthor({ name: user.username, iconURL: user.avatarURL() })
+		.setAuthor({ name: user.username, iconURL: user.avatarURL()! })
 		.setDescription('Stats for the monster')
 		.setThumbnail(img)
 		.addFields(
@@ -23,7 +25,7 @@ function monsterEmbed(user, res) {
 		.setTimestamp();
 }
 
-function showMonsterEmbed(user, res, level) {
+export function showMonsterEmbed(user: User, res: any, level: number) {
 	console.log('[DisplayMonster] Starts showMonsterEmbed build');
 	const name = res.rows[0].display_name;
 	const className = res.rows[0].class;
@@ -43,13 +45,13 @@ function showMonsterEmbed(user, res, level) {
 			// TODO maybe change to include 'Obtained: TIME'
 		)
 		.setImage(img)
-		.setColor(fetchMonsterDetails(rarity).color)
+		.setColor(fetchMonsterDetails(rarity)?.color || 0x333333)
 		.setTimestamp()
-		.setFooter({ text: `Owned by: ${user.username}`, iconURL: user.avatarURL() });
+		.setFooter({ text: `Owned by: ${user.username}`, iconURL: user.avatarURL()! });
 	// TODO maybe do OBTAINED AT
 }
 
-function runaway(user, res) {
+export function runaway(user: User, res: any) {
 	console.log('[RunAwayEmbed] Monster ran away');
 	const name = res.rows[0].display_name;
 	const className = res.rows[0].class;
@@ -70,7 +72,7 @@ function runaway(user, res) {
 		.setThumbnail(img);
 }
 
-function badCatch(user, res) {
+export function badCatch(user: User, res: any) {
 	console.log('[BadCatchEmbed] Monster broke free and ran away');
 	const name = res.rows[0].display_name;
 	const className = res.rows[0].class;
@@ -91,7 +93,7 @@ function badCatch(user, res) {
 		.setThumbnail(img);
 }
 
-function successCatch(user, res, shmoinsToAdd) {
+export function successCatch(user: User, res: any, shmoinsToAdd: number) {
 	console.log(`[SuccessCatchEmbed] Monster was caught and added to ${user.username}'s inventory!`);
 	const name = res.rows[0].display_name;
 	const className = res.rows[0].class;
@@ -112,7 +114,7 @@ function successCatch(user, res, shmoinsToAdd) {
 		.setThumbnail(img);
 }
 
-function catchEmbed(user, res) {
+export function catchEmbed(user: User, res: any) {
 	console.log('[CatchEmbed] Starting catch game display...');
 	const name = res.rows[0].display_name;
 	const className = res.rows[0].class;
@@ -121,7 +123,7 @@ function catchEmbed(user, res) {
 	const img = res.rows[0].img;
 
 	return new EmbedBuilder()
-		.setColor(fetchMonsterDetails(rarity).color)
+		.setColor(fetchMonsterDetails(rarity)?.color || 0x333333)
 		.setAuthor({ name: 'A Monster appeared!', iconURL: 'https://collection-monsters.s3.amazonaws.com/tallgrass.png' })
 		.setDescription(`**${user.username}** found a wild **${name}!**`)
 		.setThumbnail(img)
@@ -135,7 +137,7 @@ function catchEmbed(user, res) {
 		.setTimestamp();
 }
 
-function errorEmbed(description) {
+export function errorEmbed(description: string) {
 	return new EmbedBuilder()
 		.setColor(0xFE514E)
 		.setTitle('Error')
@@ -143,7 +145,7 @@ function errorEmbed(description) {
 		.setTimestamp();
 }
 
-function textEmbed(description) {
+export function textEmbed(description: string) {
 	return new EmbedBuilder()
 		.setColor(0x0099FF)
 		.setTitle('Information')

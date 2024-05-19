@@ -1,4 +1,4 @@
-module.exports.Commands = {
+export const Commands = {
 	start: '`/start`',
 	catch: '`/catch`',
 	show: '`/show [id]`',

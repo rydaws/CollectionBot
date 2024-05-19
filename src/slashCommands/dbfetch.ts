@@ -1,30 +1,31 @@
-const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { Client } = require('pg');
-const { con } = require('../util/QueryUtil');
-const { errorEmbed } = require('../util/EmbedUtil');
-const { fetchMonsterDetails } = require('../monsters/MonsterDetails');
+import { User, SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } from "discord.js";
+import { SlashCommand } from "../types";
+import { Client } from "pg";
+import con from "../util/QueryUtil";
+import { errorEmbed } from "../util/EmbedUtil";
+import { fetchMonsterDetails } from "../monsters/MonsterDetails";
 
 
 // Global variables
 let res;
-let user;
-let name;
-let className;
-let type;
-let rarity;
-let img;
+let user: User;
+let name: string;
+let className: string;
+let type: string;
+let rarity: string;
+let img: string;
 
 // Incoming SlashCommand
-module.exports = {
-	data: new SlashCommandBuilder()
+const dbfetchCommand: SlashCommand = {
+	command: new SlashCommandBuilder()
 		.setName('fetch')
 		.setDescription('Fetch monster from db by id')
 		.addIntegerOption(option =>
 			option.setName('id')
 				.setDescription('The id of the monster')
-				.setRequired(true)),
-
-	async execute(interaction) {
+				.setRequired(true))
+		.setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
+	execute: async interaction => {
 		// ID for monster
 		const id = interaction.options.getInteger('id');
 		user = interaction.user;
@@ -48,7 +49,7 @@ module.exports = {
 		}
 		catch (e) {
 			console.log(`[Fetch | ERROR] Failed to fetch monster with id ${id}.`);
-			await interaction.reply({ embeds: [new EmbedBuilder(errorEmbed('Could not fetch monster with that ID!'))] });
+			await interaction.reply({ embeds: [(errorEmbed('Could not fetch monster with that ID!'))] });
 		}
 
 		// Close SQL connection
@@ -63,9 +64,9 @@ module.exports = {
  */
 function createEmbed() {
 	return new EmbedBuilder()
-		.setColor(fetchMonsterDetails(rarity).color)
+		.setColor(fetchMonsterDetails(rarity)?.color || 0x333333)
 		.setTitle('Queried Monster')
-		.setAuthor({ name: user.username, iconURL: user.avatarURL() })
+		.setAuthor({ name: user.username, iconURL: user.avatarURL()! })
 		.setDescription('Stats for the monster')
 		.setThumbnail(img)
 		.addFields(
@@ -76,3 +77,5 @@ function createEmbed() {
 		)
 		.setTimestamp();
 }
+
+export default dbfetchCommand

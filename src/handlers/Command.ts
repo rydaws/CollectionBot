@@ -26,7 +26,7 @@ module.exports = (client : Client) => {
     client.commands.set(command.name, command)
   })
 
-  const rest = new REST({version: "10"}).setToken(process.env.TOKEN);
+  const rest = new REST({version: "10"}).setToken(process.env.DISCORD_TOKEN as string);
 
   rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {
     body: slashCommands.map(command => command.toJSON())
