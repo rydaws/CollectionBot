@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model backpack {
+  client_id   BigInt @id
+  mousetrap   Int    @default(0)
+  net         Int    @default(0)
+  lasso       Int    @default(0)
+  beartrap    Int    @default(0)
+  safe        Int    @default(0)
+  shmoins     Int    @default(0)
+  luckyshmoin Int    @default(0)
+  shmoizberry Int    @default(0)
+  player      player @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model box {
+  client_id   BigInt
+  id          Int
+  level       Int
+  active      Boolean  @default(false)
+  xp          Int      @default(0)
+  xp_required Int?     @default(100)
+  player      player   @relation(fields: [client_id], references: [client_id], onDelete: NoAction, onUpdate: NoAction)
+  monsters    monsters @relation(fields: [id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([client_id, id], map: "box_pk")
+}
+
+model deployments {
+  client_id  BigInt
+  id         Int
+  start_time DateTime? @db.Timestamp(6)
+  end_time   DateTime? @db.Timestamp(6)
+
+  @@id([client_id, id])
+}
+
+model monsters {
+  id           Int      @id @default(autoincrement())
+  display_name String   @db.VarChar(50)
+  class        String   @db.VarChar(15)
+  type         String   @db.VarChar(15)
+  rarity       String   @db.VarChar(15)
+  created_on   DateTime @db.Timestamp(6)
+  img          String?  @db.VarChar(100)
+  box          box[]
+}
+
+model player {
+  client_id      BigInt    @id
+  monsters_owned Int?      @default(0)
+  backpack       backpack?
+  box            box[]
+}

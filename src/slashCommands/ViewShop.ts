@@ -53,8 +53,7 @@ const ViewShop: SlashCommand = {
     let client;
     // SQL connection
     try {
-      client = con;
-			console.log(con);
+      client = new Client(con);
       const db = await client.connect();
 
       console.log("connected");
