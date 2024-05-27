@@ -53,7 +53,7 @@ const dbfetchCommand: SlashCommand = {
 		}
 
 		// Close SQL connection
-		await client.end()
+		await client.end();
 	},
 };
 
