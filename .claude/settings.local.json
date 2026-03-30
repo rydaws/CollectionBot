@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(ls:*)",
+      "Bash(git mv:*)",
+      "Bash(cd:*)",
+      "Bash(npx tsc:*)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(npm install:*)",
+      "Bash(where npm:*)",
+      "Bash(where node:*)",
+      "Bash(echo $PATH)",
+      "Read(//c/nvm4w/**)",
+      "Bash(/c/nvm4w/nodejs/node.exe --version)",
+      "Bash(export PATH=\"/c/Users/User/AppData/Local/nvm/v22.22.1:$PATH\")",
+      "Bash(npm --version)",
+      "Bash(npx prisma:*)"
+    ]
+  }
+}

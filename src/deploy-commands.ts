@@ -1,48 +1,47 @@
-const { REST, Routes } = require('discord.js');
-const dotenv = require('dotenv');
-const fs = require('node:fs');
+import { REST, Routes } from "discord.js";
+import { config } from "dotenv";
+import { readdirSync } from "node:fs";
+import { join } from "node:path";
 
-const commands: string[] = [];
-// Grab all the command files from the slashCommands directory you created earlier
-const commandFiles = fs.readdirSync('./slashCommands').filter((file: any) => file.endsWith('.js'));
-const staffCommandFiles = fs.readdirSync('./slashCommands/staff').filter((file: any) => file.endsWith('.js'));
+config();
 
-dotenv.config();
+const commands: any[] = [];
 
-module.exports = {
-	deploy() {
+const commandsDir = join(__dirname, "slashCommands");
+const commandFiles = readdirSync(commandsDir).filter((file) => file.endsWith(".js") || file.endsWith(".ts"));
 
-		// Grab the SlashCommandBuilder#toJSON() output of each command's data for deployment
-		for (const file of commandFiles) {
-			const command = require(`./commands/${file}`);
-			commands.push(command.data.toJSON());
-		}
+for (const file of commandFiles) {
+  const command = require(join(commandsDir, file));
+  const cmd = command.default ?? command;
+  if (cmd.data) {
+    commands.push(cmd.data.toJSON());
+  }
+}
 
-		for (const file of staffCommandFiles) {
-			const staffCommand = require(`./commands/staff/${file}`);
-			commands.push(staffCommand.data.toJSON());
-		}
+const staffDir = join(__dirname, "slashCommands/staff");
+const staffFiles = readdirSync(staffDir).filter((file) => file.endsWith(".js") || file.endsWith(".ts"));
 
-		// Construct and prepare an instance of the REST module
-		const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
+for (const file of staffFiles) {
+  const command = require(join(staffDir, file));
+  const cmd = command.default ?? command;
+  if (cmd.data) {
+    commands.push(cmd.data.toJSON());
+  }
+}
 
-		// and deploy your slashCommands!
-		(async () => {
-			try {
-				console.log(`Started refreshing ${commands.length} application (/) commands.`);
+export async function deploy() {
+  const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
 
-				// The put method is used to fully refresh all slashCommands in the guild with the current set
-				const data = await rest.put(
-					Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
-					{ body: commands },
-				);
+  try {
+    console.log(`Started refreshing ${commands.length} application (/) commands.`);
 
-				console.log(`Successfully reloaded ${data.length} application (/) commands.`);
-			}
-			catch (error) {
-				// And of course, make sure you catch and log any errors!
-				console.error(error);
-			}
-		})();
-	},
-};
+    const data: any = await rest.put(
+      Routes.applicationGuildCommands(process.env.CLIENT_ID!, process.env.GUILD_ID!),
+      { body: commands }
+    );
+
+    console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+  } catch (error) {
+    console.error(error);
+  }
+}

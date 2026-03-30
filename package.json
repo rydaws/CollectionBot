@@ -4,8 +4,12 @@
   "description": "",
   "main": "src/bot.ts",
   "scripts": {
-    "start": "cls && node build/index.js",
-    "build": "cls && node build.js"
+    "start": "node build/index.js",
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "repository": {
     "type": "git",
@@ -19,20 +23,14 @@
   },
   "homepage": "https://github.com/rydaws/CollectionBot#readme",
   "dependencies": {
-    "@discordjs/rest": "^1.1.0",
     "@prisma/client": "^5.14.0",
-    "@types/node": "^18.7.14",
-    "axios": "1.6.0",
-    "chalk": "^4.1.2",
     "discord.js": "^14.8.0",
-    "dotenv": "^16.0.3",
-    "pg": "^8.11.5",
-    "typescript": "^5.4.5"
+    "dotenv": "^16.0.3"
   },
   "devDependencies": {
-    "@types/pg": "^8.11.5",
-    "drizzle-kit": "^0.20.17",
+    "@types/node": "^18.7.14",
     "eslint": "^9.3.0",
-    "prisma": "^5.14.0"
+    "prisma": "^5.14.0",
+    "typescript": "^5.4.5"
   }
 }

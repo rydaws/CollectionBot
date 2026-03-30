@@ -1,81 +1,49 @@
-import { User, SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } from "discord.js";
+import { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, ChatInputCommandInteraction } from "discord.js";
 import { SlashCommand } from "../types";
-import { Client } from "pg";
-import con from "../util/QueryUtil";
 import { errorEmbed } from "../util/EmbedUtil";
 import { fetchMonsterDetails } from "../monsters/MonsterDetails";
+import prisma from "../util/prisma";
 
-
-// Global variables
-let res;
-let user: User;
-let name: string;
-let className: string;
-let type: string;
-let rarity: string;
-let img: string;
-
-// Incoming SlashCommand
 const dbfetchCommand: SlashCommand = {
-	command: new SlashCommandBuilder()
-		.setName('fetch')
-		.setDescription('Fetch monster from db by id')
-		.addIntegerOption(option =>
-			option.setName('id')
-				.setDescription('The id of the monster')
-				.setRequired(true))
-		.setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
-	execute: async interaction => {
-		// ID for monster
-		const id = interaction.options.getInteger('id');
-		user = interaction.user;
+  command: new SlashCommandBuilder()
+    .setName("fetch")
+    .setDescription("Fetch monster from db by id")
+    .addIntegerOption((option) => option.setName("id").setDescription("The id of the monster").setRequired(true))
+    .setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages),
+  execute: async (interaction: ChatInputCommandInteraction) => {
+    const id = interaction.options.getInteger("id")!;
+    const user = interaction.user;
 
-		// SQL connection
-		const client  = new Client(con);
-		await client.connect();
+    try {
+      const monster = await prisma.monsters.findUnique({ where: { id } });
 
-		try {
-			// Gets monster data
-			res = await client.query(`SELECT * FROM monsters WHERE id=${id}`);
-			name = res.rows[0].display_name;
-			className = res.rows[0].class;
-			type = res.rows[0].type;
-			rarity = res.rows[0].rarity;
-			img = res.rows[0].img;
+      if (!monster) {
+        await interaction.reply({ embeds: [errorEmbed("Could not fetch monster with that ID!")] });
+        return;
+      }
 
-			console.log(`[Fetch] Retrieving monster with ID ${id} and name ${name}.`);
+      console.log(`[Fetch] Retrieving monster with ID ${id} and name ${monster.display_name}.`);
 
-			await interaction.reply({ embeds: [createEmbed()] });
-		}
-		catch (e) {
-			console.log(`[Fetch | ERROR] Failed to fetch monster with id ${id}.`);
-			await interaction.reply({ embeds: [(errorEmbed('Could not fetch monster with that ID!'))] });
-		}
+      const embed = new EmbedBuilder()
+        .setColor(fetchMonsterDetails(monster.rarity)?.color || 0x333333)
+        .setTitle("Queried Monster")
+        .setAuthor({ name: user.username, iconURL: user.avatarURL()! })
+        .setDescription("Stats for the monster")
+        .setThumbnail(monster.img)
+        .addFields(
+          { name: "Name", value: monster.display_name, inline: true },
+          { name: "Class", value: monster.class, inline: true },
+          { name: "Type", value: monster.type, inline: true },
+          { name: "Rarity", value: monster.rarity, inline: true }
+        )
+        .setTimestamp();
 
-		// Close SQL connection
-		await client.end();
-	},
+      await interaction.reply({ embeds: [embed] });
+    } catch (e) {
+      console.log(`[Fetch | ERROR] Failed to fetch monster with id ${id}.`);
+      await interaction.reply({ embeds: [errorEmbed("Could not fetch monster with that ID!")] });
+    }
+  },
 };
 
-/**
- * Creates monster embed.
- *
- * @returns {EmbedBuilder} - The embed to be displayed
- */
-function createEmbed() {
-	return new EmbedBuilder()
-		.setColor(fetchMonsterDetails(rarity)?.color || 0x333333)
-		.setTitle('Queried Monster')
-		.setAuthor({ name: user.username, iconURL: user.avatarURL()! })
-		.setDescription('Stats for the monster')
-		.setThumbnail(img)
-		.addFields(
-			{ name: 'Name', value: `${name}`, inline: true },
-			{ name: 'Class', value: `${className}`, inline: true },
-			{ name: 'Type', value: `${type}`, inline: true },
-			{ name: 'Rarity', value: `${rarity}`, inline: true },
-		)
-		.setTimestamp();
-}
-
-export default dbfetchCommand
+export default dbfetchCommand;
